@@ -117,6 +117,7 @@ class Symbol(Basic):
         return hash(self.name)
 
     def __eq__(self, o):
+        o = sympify(o)
         if o.type == SYMBOL:
             return self.name == o.name
         return False
