@@ -283,11 +283,18 @@ class Pow(Basic):
     @classmethod
     def canonicalize(cls, args):
         base, exp = args
+        if base.type == INTEGER:
+            if base.i == 0:
+                return Integer(0)
+            if base.i == 1:
+                return Integer(1)
         if exp.type == INTEGER:
             if exp.i == 0:
                 return Integer(1)
             if exp.i == 1:
                 return base
+        if base.type == POW:
+            return Pow((base.args[0], base.args[1]*exp))
         return Pow(args, False)
 
     def __str__(self):

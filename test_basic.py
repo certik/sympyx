@@ -111,7 +111,7 @@ def xtest_expand2():
     assert ( (x+y)**2 * (x+z) ).expand() == \
             x**3 + 2*x**2*y + y**2*z + x**2*z + x*y**2 + 2*x*y*z
 
-def xtest_canonicalization():
+def test_canonicalization():
     x = Symbol("x")
     y = Symbol("y")
     z = Symbol("z")
@@ -124,7 +124,7 @@ def xtest_canonicalization():
     assert 1**x == 1
     assert 0**x == 0
 
-def xtest_pow():
+def test_pow():
     x = Symbol("x")
     y = Symbol("y")
     z = Symbol("z")
