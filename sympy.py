@@ -90,6 +90,9 @@ class Integer(Basic):
         obj.i = i
         return obj
 
+    def __hash__(self):
+        return hash(self.i)
+
     def __eq__(self, o):
         o = sympify(o)
         if o.type == INTEGER:

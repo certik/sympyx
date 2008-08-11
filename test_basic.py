@@ -156,7 +156,7 @@ def xtest_args_type():
     assert ( x-y ).type == ADD
     assert set(( x-y ).args) == set((x, -y))
 
-def xtest_hash():
+def test_hash():
     x = Symbol("x")
     y = Symbol("y")
     z = Symbol("z")
