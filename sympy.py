@@ -75,6 +75,13 @@ class Basic(object):
     def __ne__(self, x):
         return not self.__eq__(x)
 
+    def __eq__(self, o):
+        o = sympify(o)
+        if o.type == self.type:
+            return self.args == o.args
+        else:
+            return False
+
 
 class Integer(Basic):
 
@@ -152,12 +159,22 @@ class Add(Basic):
                     d[key] += coeff
                 else:
                     d[key] = coeff
-        print d
         args = []
         for a, b in d.iteritems():
             args.append(Mul((a, b)))
 
         return Add(args, False)
+
+    def __eq__(self, o):
+        o = sympify(o)
+        if o.type == ADD:
+            a = list(self.args[:])
+            a.sort(key=hash)
+            b = list(o.args[:])
+            b.sort(key=hash)
+            return a == b
+        else:
+            return False
 
     def __str__(self):
         s = str(self.args[0])

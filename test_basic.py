@@ -14,21 +14,21 @@ def test_eq():
     assert not (x != a)
     assert x != y
 
-    assert Add(x, y) == Add(x, y)
-    assert Add(a, y) == Add(x, y)
-    assert Add(x, y) == Add(y, x)
-    assert Add(x, y) != Add(y, z)
+    assert x + y == x + y
+    assert a + y == x + y
+    assert x + y == y + x
+    assert x + y != y + z
 
-    assert Mul(x, y) == Mul(x, y)
-    assert Mul(a, y) == Mul(x, y)
-    assert Mul(x, y) == Mul(y, x)
-    assert Mul(x, y) != Mul(y, z)
+    assert x * y == x * y
+    assert a * y == x * y
+    assert x * y == y * x
+    assert x * y != y * z
 
-    assert Pow(x, y) == Pow(x, y)
-    assert Pow(a, y) == Pow(x, y)
-    assert Pow(x, y) != Pow(y, x)
-    assert Pow(x, y) != Pow(y, z)
-    assert Pow(a, y) != Pow(x, z)
+    assert x ** y == x ** y
+    assert a ** y == x ** y
+    assert x ** y != y ** x
+    assert x ** y != y ** z
+    assert a ** y != x ** z
 
     assert Integer(3) == Integer(3)
     assert Integer(3) != Integer(4)
