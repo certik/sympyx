@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 from timeit import default_timer as clock
-from sympy import Symbol, Add, Mul, Integer, ADD, MUL, POW, INTEGER, SYMBOL
+from sympy import Symbol, Add, Mul, Integer, ADD, MUL, POW, INTEGER, SYMBOL, \
+        multinomial_coefficients
+
+N = 4
 
 x = Symbol("x")
 y = Symbol("y")
 z = Symbol("z")
-f = (x+y+z+1)**2
-e = f*(f+1)
 
 def doit1(e):
     e = e.expand()
@@ -23,7 +24,7 @@ def doit2(e):
     t = clock() - t
     return f, t
 
-e = (x+y+z+1)**10
+e = (x+y+z+1)**N
 
 print "1:"
 #a1 = doit1(e)
@@ -37,11 +38,9 @@ t_tot = clock()-t_tot
 
 print "done"
 
-from multinomial import multinomial_coefficients
-
 t_mul = clock()
-a= multinomial_coefficients(4, 10)
-b= multinomial_coefficients(4, 20)
+a= multinomial_coefficients(4, N)
+b= multinomial_coefficients(4, 2*N)
 t_mul = clock() - t_mul
 #print "a1: ", a1
 #print "a2: ", a2
