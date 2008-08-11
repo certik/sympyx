@@ -79,12 +79,12 @@ def xtest_arit():
     assert -x == Mul(Integer(-1), x)
     assert +x == x
 
-def xtest_int_conversion():
+def test_int_conversion():
     x = Symbol("x")
-    assert x+1 == Add(x, 1)
+    assert x+1 == x + 1
     assert x*1 == x
     assert x**1 == x
-    assert x/2 == Mul(x, Pow(2, -1))
+    assert x/2 == x * (Integer(2) ** -1)
 
 def xtest_expand1():
     x = Symbol("x")
