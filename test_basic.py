@@ -33,17 +33,17 @@ def test_eq():
     assert Integer(3) == Integer(3)
     assert Integer(3) != Integer(4)
 
-def xtest_add():
+def test_add():
     x = Symbol("x")
     y = Symbol("y")
     z = Symbol("z")
 
-    assert Add(Add(x, y), z) == Add(x, Add(y, z))
-    assert Add(Add(z, x), y) == Add(x, Add(y, z))
-    assert Add(Add(z, x), x) != Add(x, Add(y, z))
+    assert (x + y) + z == x + (y + z)
+    assert (z + x) + y == x + (y + z)
+    assert (z + x) + x != x + (y + z)
 
-    assert Add(x, x) == Mul(Integer(2), x)
-    assert Add(Add(Add(x, y), z), x) == Add(Add(Mul(Integer(2), x), y), z)
+    assert x + x == Integer(2) * x
+    assert ((x + y) + z) + x == (Integer(2)*x + y) + z
 
 def xtest_mul():
     x = Symbol("x")

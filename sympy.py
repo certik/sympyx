@@ -145,8 +145,11 @@ class Add(Basic):
     @classmethod
     def canonicalize(cls, args):
         d = {}
+        num = Integer(0)
         for a in args:
-            if a.type == ADD:
+            if a.type == INTEGER:
+                num += a
+            elif a.type == ADD:
                 for b in a.args:
                     coeff, key = b.as_coeff_rest()
                     if key in d:
@@ -159,11 +162,17 @@ class Add(Basic):
                     d[key] += coeff
                 else:
                     d[key] = coeff
+        if len(d)==0:
+            return num
         args = []
         for a, b in d.iteritems():
             args.append(Mul((a, b)))
-
-        return Add(args, False)
+        if num.i != 0:
+            args.insert(0, num)
+        if len(args) == 1:
+            return args[0]
+        else:
+            return Add(args, False)
 
     def __eq__(self, o):
         o = sympify(o)
