@@ -344,6 +344,9 @@ class Pow(Basic):
             s = "%s^%s" % (s, str(self.args[1]))
         return s
 
+    def as_base_exp(self):
+        return self.args
+
     def expand(self):
         base, exp = self.args
         if base.type == ADD and exp.type == INTEGER:

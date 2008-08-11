@@ -134,6 +134,9 @@ def test_pow():
     # this is maybe not mathematically correct:
     assert (x**y)**z == x**(y*z)
 
+    assert x*x == x**2
+    assert x*x*x == x**3
+
 def test_args_type():
     x = Symbol("x")
     y = Symbol("y")
