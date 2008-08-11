@@ -39,17 +39,38 @@ class Basic(object):
     def __add__(x, y):
         return Add((x, y))
 
+    def __radd__(x, y):
+        return x.__add__(y)
+
     def __sub__(x, y):
         return Add((x, -y))
+
+    def __rsub__(x, y):
+        return Add((y, -x))
 
     def __mul__(x, y):
         return Mul((x, y))
 
+    def __rmul__(x, y):
+        return Mul((y, x))
+
+    def __div__(x, y):
+        return Mul((x, Pow((y, Integer(-1)))))
+
+    def __rdiv__(x, y):
+        return Mul((y, Pow((x, Integer(-1)))))
+
     def __pow__(x, y):
         return Pow((x, y))
 
+    def __rpow__(x, y):
+        return Pow((y, x))
+
     def __neg__(x):
         return Mul((Integer(-1), x))
+
+    def __pos__(x):
+        return x
 
 
 class Integer(Basic):
@@ -63,14 +84,16 @@ class Integer(Basic):
         return str(self.i)
 
     def __add__(self, o):
+        o = sympify(o)
         if o.type == INTEGER:
             return Integer(self.i+o.i)
-        return NotImplemented
+        return Basic.__add__(self, o)
 
     def __mul__(self, o):
+        o = sympify(o)
         if o.type == INTEGER:
             return Integer(self.i*o.i)
-        return NotImplemented
+        return Basic.__mul__(self, o)
 
 
 class Symbol(Basic):

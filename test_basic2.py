@@ -1,4 +1,4 @@
-from csympy import Symbol, Integer
+from sympy import Symbol, Integer
 
 import py
 
@@ -24,7 +24,7 @@ def dotest(s):
         for y in all_objs:
             s(x,y)
 
-def test_basic():
+def test_basic1():
     def s(a,b):
         x = a
         x = +a

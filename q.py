@@ -14,6 +14,8 @@ a = Symbol("x")
 #print (x*y) == (y*x)
 #print (x*y).args
 #print (y*x).args
-e = x*y-y*x
-e = x+y-x
-print e
+#e = x*y-y*x
+#e = x+y-x
+#print e
+
+print 4+Integer(5)
