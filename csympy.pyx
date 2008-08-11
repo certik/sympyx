@@ -8,6 +8,15 @@ cdef extern from "stdint.h":
 
 cdef extern from "glib.h":
     ctypedef unsigned guint
+    ctypedef void *gconstpointer
+    guint g_int_hash(gconstpointer v)
+    guint g_str_hash(gconstpointer v)
+
+def int_hash(int v):
+    return g_int_hash(&v)
+
+def str_hash(char *v):
+    return g_str_hash(v)
 
 cdef class Basic:
 
