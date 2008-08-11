@@ -261,8 +261,12 @@ class Mul(Basic):
 
     def as_coeff_rest(self):
         if self.args[0].type == INTEGER:
-            return (self.args[0], Mul(self.args[1:]))
+            return self.as_two_terms()
         return (Integer(1), self)
+
+    def as_two_terms(self):
+        return (self.args[0], Mul(self.args[1:]))
+
 
     def __str__(self):
         s = str(self.args[0])
@@ -274,6 +278,35 @@ class Mul(Basic):
             else:
                 s = "%s*%s" % (s, str(x))
         return s
+
+    @classmethod
+    def expand_two(self, a, b):
+        """
+        Both a and b are assumed to be expanded.
+        """
+        if a.type == ADD and b.type == ADD:
+            r = Integer(0)
+            for x in a.args:
+                for y in b.args:
+                    r += x*y
+            return r
+        if a.type == ADD:
+            r = Integer(0)
+            for x in a.args:
+                    r += x*b
+            return r
+        if b.type == ADD:
+            r = Integer(0)
+            for y in b.args:
+                    r += a*y
+            return r
+        return a*b
+
+    def expand(self):
+        a, b = self.as_two_terms()
+        a = a.expand()
+        b = b.expand()
+        return Mul.expand_two(a, b)
 
 class Pow(Basic):
 
