@@ -39,11 +39,11 @@ def int_hash(int v):
 def str_hash(char *v):
     return g_str_hash(v)
 
-cdef class HashTable:
+cdef class Table:
     cdef GHashTable *thisptr
 
     def __init__(self):
-        self.thisptr = g_hash_table_new(&g_int_hash, NULL)
+        self.thisptr = g_hash_table_new(NULL, NULL)
 
     def __dealloc__(self):
         g_hash_table_destroy(self.thisptr)
@@ -61,3 +61,18 @@ cdef class HashTable:
         while g_hash_table_iter_next(&iter, &key, &value):
             a.append((<object>key, <object>value))
         return a
+
+cdef guint my_hash(gconstpointer v):
+    o= <object>v
+    return hash(o)
+
+cdef gboolean my_equal(gconstpointer a, gconstpointer b):
+    o1 = <object>a
+    o2 = <object>b
+    return o1 == o2
+
+
+cdef class HashTable(Table):
+
+    def __init__(self):
+        self.thisptr = g_hash_table_new(&my_hash, &my_equal)
