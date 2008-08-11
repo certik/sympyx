@@ -175,7 +175,7 @@ def xtest_hash():
     assert hash(x*y*z) == hash(y*z*x)
     assert hash(x*y*z) == hash(y*z*a)
 
-def xtest_hash2():
+def test_hash2():
     x = Symbol("x")
     y = Symbol("y")
     z = Symbol("z")
