@@ -1,0 +1,13 @@
+syntax: glob
+
+*.o
+*.so
+*.pyd
+*.pyc
+*.swp
+
+tags
+
+basic
+csympy.c
+csympy_api.h
