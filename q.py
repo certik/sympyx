@@ -17,5 +17,7 @@ a = Symbol("x")
 #e = x*y-y*x
 #e = x+y-x
 #print e
+print Integer(3) == Integer(3)
 
-print 4+Integer(5)
+print (x*y+1).args
+#== (Integer(1), x*y)[0]

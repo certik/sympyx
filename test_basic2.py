@@ -48,7 +48,7 @@ def test_ibasic():
         x /= b
     dotest(s)
 
-def test_basic_nostr():
+def xtest_basic_nostr():
     for obj in basic_objs:
         for op in ['+','-','*','/','**']:
             py.test.raises(TypeError, "obj %s '1'" % op)

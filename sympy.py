@@ -17,7 +17,7 @@ class Basic(object):
     def __new__(cls, type, args):
         obj = object.__new__(cls)
         obj.type = type
-        obj._args = args
+        obj._args = tuple(args)
         return obj
 
     def __repr__(self):
@@ -80,6 +80,13 @@ class Integer(Basic):
         obj.i = i
         return obj
 
+    def __eq__(self, o):
+        o = sympify(o)
+        if o.type == INTEGER:
+            return self.i == o.i
+        else:
+            return False
+
     def __str__(self):
         return str(self.i)
 
@@ -136,6 +143,7 @@ class Add(Basic):
                     d[key] += coeff
                 else:
                     d[key] = coeff
+        print d
         args = []
         for a, b in d.iteritems():
             args.append(Mul((a, b)))
@@ -181,7 +189,7 @@ class Mul(Basic):
                     d[key] += coeff
                 else:
                     d[key] = coeff
-        if num.i == 0:
+        if num.i == 0 or len(d)==0:
             return num
         args = []
         for a, b in d.iteritems():
@@ -194,15 +202,16 @@ class Mul(Basic):
             return Mul(args, False)
 
     def __hash__(self):
-        a = self.args[:]
+        a = list(self.args[:])
         a.sort(key=hash)
         return hash_seq(a)
 
     def __eq__(self, o):
+        o = sympify(o)
         if o.type == MUL:
-            a = self.args[:]
+            a = list(self.args[:])
             a.sort(key=hash)
-            b = o.args[:]
+            b = list(o.args[:])
             b.sort(key=hash)
             return a == b
         else:
@@ -228,7 +237,7 @@ class Pow(Basic):
 
     def __new__(cls, args, canonicalize=True):
         if canonicalize == False:
-            obj = Basic.__new__(cls, MUL, args)
+            obj = Basic.__new__(cls, POW, args)
             return obj
         args = [sympify(x) for x in args]
         return Pow.canonicalize(args)
