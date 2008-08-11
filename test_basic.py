@@ -57,26 +57,26 @@ def test_mul():
     assert x * x == x ** Integer(2)
     assert ((x * y) * z) * x == ((x ** Integer(2)) * y) * z
 
-def xtest_arit():
+def test_arit():
     x = Symbol("x")
     y = Symbol("y")
     z = Symbol("z")
 
-    assert x+y == Add(x, y)
-    assert x+y+z == Add(Add(x, y), z)
+    assert x+y == x + y
+    assert x+y+z == (x + y) + z
 
-    assert x-y == Add(x, Mul(Integer(-1), y))
-    assert y-x == Add(Mul(Integer(-1), x), y)
+    assert x-y == x + (Integer(-1) * y)
+    assert y-x == (Integer(-1) * x) + y
 
-    assert x*y == Mul(x, y)
-    assert x*y*z == Mul(z, Mul(x, y))
+    assert x*y == x * y
+    assert x*y*z == z * (x * y)
 
-    assert x/y == Mul(x, Pow(y, Integer(-1)))
-    assert y/x == Mul(Pow(x, Integer(-1)), y)
+    assert x/y == x * (y ** Integer(-1))
+    assert y/x == (x ** Integer(-1)) * y
 
-    assert x**Integer(2) == Pow(x, Integer(2))
+    assert x**Integer(2) == x ** Integer(2)
 
-    assert -x == Mul(Integer(-1), x)
+    assert -x == Integer(-1) * x
     assert +x == x
 
 def test_int_conversion():
