@@ -201,6 +201,12 @@ class Add(Basic):
                 s = "(%s)" % s
         return s
 
+    def expand(self):
+        r = Integer(0)
+        for term in self.args:
+            r += term.expand()
+        return r
+
 class Mul(Basic):
 
     def __new__(cls, args, canonicalize=True):

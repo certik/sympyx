@@ -6,4 +6,4 @@ z = Symbol("z")
 a = Symbol("x")
 
 #print x+y == x+y
-print x*x*x
+print ( x*(x+y)**2 + z*(x+y)**2 ).expand()
