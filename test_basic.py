@@ -171,7 +171,7 @@ def test_hash():
 
     assert hash(x*y) == hash(y*x)
     assert hash(x*y) == hash(y*a)
-    #assert hash(x*y) != hash(y*z)
+    assert hash(x*y) != hash(y*z)
     assert hash(x*y*z) == hash(y*z*x)
     assert hash(x*y*z) == hash(y*z*a)
 
