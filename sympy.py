@@ -226,6 +226,9 @@ class Mul(Basic):
             elif a.type == MUL:
                 for b in a.args:
                     key, coeff = b.as_base_exp()
+                    if key.type == INTEGER and coeff.type == INTEGER:
+                        num *= b
+                        continue
                     if key in d:
                         d[key] += coeff
                     else:
@@ -363,7 +366,7 @@ class Pow(Basic):
             for powers, coeff in d.iteritems():
                 t = Integer(coeff)
                 for x, p in zip(base.args, powers):
-                    t*= x**p
+                    t *= x**p
                 r += t
             return r
         return self

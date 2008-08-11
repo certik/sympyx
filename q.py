@@ -6,6 +6,8 @@ z = Symbol("z")
 a = Symbol("x")
 
 #print x+y == x+y
-b = ( (x+y+z+1)**8 ).expand()
+f = (x+y+z+1)**2
+e = f*(f+1)
 
-print b
+print f
+print f.expand()
