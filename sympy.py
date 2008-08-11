@@ -299,12 +299,12 @@ class Mul(Basic):
         if a.type == ADD:
             r = Integer(0)
             for x in a.args:
-                    r += x*b
+                r += x*b
             return r
         if b.type == ADD:
             r = Integer(0)
             for y in b.args:
-                    r += a*y
+                r += a*y
             return r
         return a*b
 
