@@ -45,17 +45,17 @@ def test_add():
     assert x + x == Integer(2) * x
     assert ((x + y) + z) + x == (Integer(2)*x + y) + z
 
-def xtest_mul():
+def test_mul():
     x = Symbol("x")
     y = Symbol("y")
     z = Symbol("z")
 
-    assert Mul(Mul(x, y), z) == Mul(x, Mul(y, z))
-    assert Mul(Mul(z, x), y) == Mul(x, Mul(y, z))
-    assert Mul(Mul(z, x), x) != Mul(x, Mul(y, z))
+    assert (x * y) * z == x * (y * z)
+    assert (z * x) * y == x * (y * z)
+    assert (z * x) * x != x * (y * z)
 
-    assert Mul(x, x) == Pow(x, Integer(2))
-    assert Mul(Mul(Mul(x, y), z), x) == Mul(Mul(Pow(x, Integer(2)), y), z)
+    assert x * x == x ** Integer(2)
+    assert ((x * y) * z) * x == ((x ** Integer(2)) * y) * z
 
 def xtest_arit():
     x = Symbol("x")

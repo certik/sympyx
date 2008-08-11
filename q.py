@@ -6,4 +6,4 @@ z = Symbol("z")
 a = Symbol("x")
 
 #print x+y == x+y
-print x+x == 2*x
+print x*x #== 2*x

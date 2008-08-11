@@ -213,13 +213,13 @@ class Mul(Basic):
                 num *= a
             elif a.type == MUL:
                 for b in a.args:
-                    coeff, key = b.as_base_exp()
+                    key, coeff = b.as_base_exp()
                     if key in d:
                         d[key] += coeff
                     else:
                         d[key] = coeff
             else:
-                coeff, key = a.as_base_exp()
+                key, coeff = a.as_base_exp()
                 if key in d:
                     d[key] += coeff
                 else:
@@ -228,7 +228,7 @@ class Mul(Basic):
             return num
         args = []
         for a, b in d.iteritems():
-            args.append(Pow((b, a)))
+            args.append(Pow((a, b)))
         if num.i != 1:
             args.insert(0, num)
         if len(args) == 1:
