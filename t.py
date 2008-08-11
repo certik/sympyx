@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-from csympy import int_hash, str_hash
+from csympy import int_hash, str_hash, HashTable
 
 print int_hash(5)
 print int_hash(6)
@@ -13,3 +13,17 @@ print
 print str_hash("ano")
 print str_hash("ne")
 print str_hash("n")
+
+print "hash"
+h = HashTable()
+h.insert(1, 2)
+h.insert(3, 5)
+h.insert(2, 6)
+print h.list()
+
+print "hash"
+h = HashTable()
+h.insert(1, 2)
+h.insert(3, 5)
+h.insert(2, 6)
+print h.list()
