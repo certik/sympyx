@@ -36,6 +36,9 @@ class Basic(object):
     def as_base_exp(self):
         return (self, Integer(1))
 
+    def expand(self):
+        return self
+
     def __add__(x, y):
         return Add((x, y))
 
@@ -263,12 +266,13 @@ class Mul(Basic):
 
     def __str__(self):
         s = str(self.args[0])
-        if self.args[0].type == MUL:
+        if self.args[0].type in [ADD, MUL]:
             s = "(%s)" % str(s)
         for x in self.args[1:]:
-            s = "%s*%s" % (s, str(x))
-            if x.type == MUL:
-                s = "(%s)" % s
+            if x.type in [ADD, MUL]:
+                s = "%s * (%s)" % (s, str(x))
+            else:
+                s = "%s*%s" % (s, str(x))
         return s
 
 class Pow(Basic):

@@ -96,7 +96,7 @@ def test_expand1():
 
     assert ( (x+y+z)**2 ).expand() == x**2 + y**2 + z**2 + 2*x*y + 2*x*z + 2*y*z
 
-def xtest_expand2():
+def test_expand2():
     x = Symbol("x")
     y = Symbol("y")
     z = Symbol("z")
