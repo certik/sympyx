@@ -134,7 +134,7 @@ def xtest_pow():
     # this is maybe not mathematically correct:
     assert (x**y)**z == x**(y*z)
 
-def xtest_args_type():
+def test_args_type():
     x = Symbol("x")
     y = Symbol("y")
     z = Symbol("z")
