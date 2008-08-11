@@ -86,7 +86,7 @@ def test_int_conversion():
     assert x**1 == x
     assert x/2 == x * (Integer(2) ** -1)
 
-def xtest_expand1():
+def test_expand1():
     x = Symbol("x")
     y = Symbol("y")
     z = Symbol("z")
