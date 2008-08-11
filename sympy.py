@@ -99,7 +99,6 @@ class Add(Basic):
     @classmethod
     def canonicalize(cls, args):
         d = {}
-        #print args
         for a in args:
             if a.type == ADD:
                 for b in a.args:
@@ -114,7 +113,6 @@ class Add(Basic):
                     d[key] += coeff
                 else:
                     d[key] = coeff
-        print d
         args = []
         for a, b in d.iteritems():
             args.append(Mul((a, b)))

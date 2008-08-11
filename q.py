@@ -10,9 +10,10 @@ a = Symbol("x")
 #e = Integer(1) + Integer(2)
 #print e
 
-print hash(x*y) == hash(y*x)
-print (x*y) == (y*x)
-print (x*y).args
-print (y*x).args
+#print hash(x*y) == hash(y*x)
+#print (x*y) == (y*x)
+#print (x*y).args
+#print (y*x).args
 e = x*y-y*x
+e = x+y-x
 print e
