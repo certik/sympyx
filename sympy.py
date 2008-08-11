@@ -72,6 +72,9 @@ class Basic(object):
     def __pos__(x):
         return x
 
+    def __ne__(self, x):
+        return not self.__eq__(x)
+
 
 class Integer(Basic):
 
@@ -112,6 +115,11 @@ class Symbol(Basic):
 
     def __hash__(self):
         return hash(self.name)
+
+    def __eq__(self, o):
+        if o.type == SYMBOL:
+            return self.name == o.name
+        return False
 
     def __str__(self):
         return self.name

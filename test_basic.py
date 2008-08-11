@@ -33,7 +33,7 @@ def test_eq():
     assert Integer(3) == Integer(3)
     assert Integer(3) != Integer(4)
 
-def test_add():
+def xtest_add():
     x = Symbol("x")
     y = Symbol("y")
     z = Symbol("z")
@@ -45,7 +45,7 @@ def test_add():
     assert Add(x, x) == Mul(Integer(2), x)
     assert Add(Add(Add(x, y), z), x) == Add(Add(Mul(Integer(2), x), y), z)
 
-def test_mul():
+def xtest_mul():
     x = Symbol("x")
     y = Symbol("y")
     z = Symbol("z")
@@ -57,7 +57,7 @@ def test_mul():
     assert Mul(x, x) == Pow(x, Integer(2))
     assert Mul(Mul(Mul(x, y), z), x) == Mul(Mul(Pow(x, Integer(2)), y), z)
 
-def test_arit():
+def xtest_arit():
     x = Symbol("x")
     y = Symbol("y")
     z = Symbol("z")
@@ -79,14 +79,14 @@ def test_arit():
     assert -x == Mul(Integer(-1), x)
     assert +x == x
 
-def test_int_conversion():
+def xtest_int_conversion():
     x = Symbol("x")
     assert x+1 == Add(x, 1)
     assert x*1 == x
     assert x**1 == x
     assert x/2 == Mul(x, Pow(2, -1))
 
-def test_expand1():
+def xtest_expand1():
     x = Symbol("x")
     y = Symbol("y")
     z = Symbol("z")
@@ -96,7 +96,7 @@ def test_expand1():
 
     assert ( (x+y+z)**2 ).expand() == x**2 + y**2 + z**2 + 2*x*y + 2*x*z + 2*y*z
 
-def test_expand2():
+def xtest_expand2():
     x = Symbol("x")
     y = Symbol("y")
     z = Symbol("z")
@@ -111,7 +111,7 @@ def test_expand2():
     assert ( (x+y)**2 * (x+z) ).expand() == \
             x**3 + 2*x**2*y + y**2*z + x**2*z + x*y**2 + 2*x*y*z
 
-def test_canonicalization():
+def xtest_canonicalization():
     x = Symbol("x")
     y = Symbol("y")
     z = Symbol("z")
@@ -124,7 +124,7 @@ def test_canonicalization():
     assert 1**x == 1
     assert 0**x == 0
 
-def test_pow():
+def xtest_pow():
     x = Symbol("x")
     y = Symbol("y")
     z = Symbol("z")
@@ -134,7 +134,7 @@ def test_pow():
     # this is maybe not mathematically correct:
     assert (x**y)**z == x**(y*z)
 
-def test_args_type():
+def xtest_args_type():
     x = Symbol("x")
     y = Symbol("y")
     z = Symbol("z")
@@ -156,7 +156,7 @@ def test_args_type():
     assert ( x-y ).type == ADD
     assert set(( x-y ).args) == set((x, -y))
 
-def test_hash():
+def xtest_hash():
     x = Symbol("x")
     y = Symbol("y")
     z = Symbol("z")
@@ -175,7 +175,7 @@ def test_hash():
     assert hash(x*y*z) == hash(y*z*x)
     assert hash(x*y*z) == hash(y*z*a)
 
-def test_hash2():
+def xtest_hash2():
     x = Symbol("x")
     y = Symbol("y")
     z = Symbol("z")
