@@ -398,6 +398,8 @@ class Pow(Basic):
                 t = Mul(t)
                 if r.type == ADD:
                     add_args = list(r.args) + [t]
+                    # XXX: this needs to be checked, i.e. for some more
+                    # complicated examples one should still simplify things
                     r = Add(add_args, False)
                 else:
                     r = r + t
