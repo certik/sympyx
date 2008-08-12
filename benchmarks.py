@@ -2,8 +2,10 @@
 from timeit import default_timer as clock
 try:
     from sympy import Symbol
-except:
+    print 'I: Running SymPy'
+except ImportError:
     from sympycore import Symbol
+    print 'I: Running sympycore'
 
 x = Symbol("x")
 y = Symbol("y")
