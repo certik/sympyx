@@ -30,13 +30,19 @@ class Basic(object):
         obj = object.__new__(cls)
         obj.type = type
         obj._args = tuple(args)
+        obj.mhash = None
         return obj
 
     def __repr__(self):
         return str(self)
 
     def __hash__(self):
-        return hash_seq(self.args)
+        if self.mhash is None:
+            h = hash_seq(self.args)
+            self.mhash = h
+            return h
+        else:
+            return self.mhash
 
     @property
     def args(self):
