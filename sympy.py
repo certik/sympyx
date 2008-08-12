@@ -112,7 +112,12 @@ class Integer(Basic):
         return obj
 
     def __hash__(self):
-        return hash(self.i)
+        if self.mhash is None:
+            h = hash(self.i)
+            self.mhash = h
+            return h
+        else:
+            return self.mhash
 
     def __eq__(self, o):
         o = sympify(o)
@@ -145,7 +150,12 @@ class Symbol(Basic):
         return obj
 
     def __hash__(self):
-        return hash(self.name)
+        if self.mhash is None:
+            h = hash(self.name)
+            self.mhash = h
+            return h
+        else:
+            return self.mhash
 
     def __eq__(self, o):
         o = sympify(o)
@@ -224,9 +234,14 @@ class Add(Basic):
         return s
 
     def __hash__(self):
-        a = list(self.args[:])
-        a.sort(key=hash)
-        return hash_seq(a)
+        if self.mhash is None:
+            a = list(self.args[:])
+            a.sort(key=hash)
+            h = hash_seq(a)
+            self.mhash = h
+            return h
+        else:
+            return self.mhash
 
     def expand(self):
         r = Integer(0)
@@ -284,9 +299,14 @@ class Mul(Basic):
             return Mul(args, False)
 
     def __hash__(self):
-        a = list(self.args[:])
-        a.sort(key=hash)
-        return hash_seq(a)
+        if self.mhash is None:
+            a = list(self.args[:])
+            a.sort(key=hash)
+            h = hash_seq(a)
+            self.mhash = h
+            return h
+        else:
+            return self.mhash
 
     def __eq__(self, o):
         o = sympify(o)
