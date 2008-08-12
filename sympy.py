@@ -210,7 +210,7 @@ class Add(Basic):
 
     def freeze_args(self):
         if self._args_set is None:
-            self._args_set = set(self.args)
+            self._args_set = frozenset(self.args)
 
     def __eq__(self, o):
         o = sympify(o)
@@ -309,7 +309,7 @@ class Mul(Basic):
 
     def freeze_args(self):
         if self._args_set is None:
-            self._args_set = set(self.args)
+            self._args_set = frozenset(self.args)
 
     def __eq__(self, o):
         o = sympify(o)
