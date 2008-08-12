@@ -1,4 +1,5 @@
 csympy.c
+sympy_pyx.c
 
 *.swp
 *.o

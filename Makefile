@@ -12,7 +12,7 @@ LIBS	:= -lglib-2.0
 CFLAGS	+= -g	# -O3
 
 
-all	: csympy.so
+all	: csympy.so sympy_pyx.so
 
 
 
