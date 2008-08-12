@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 from timeit import default_timer as clock
 try:
     from sympy import Symbol
