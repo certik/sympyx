@@ -269,6 +269,7 @@ class Mul(Basic):
         a = list(self.args[:])
         a.sort(key=hash)
         return hash_seq(a)
+        return hash(frozenset(self.args))
 
     def __eq__(self, o):
         o = sympify(o)
