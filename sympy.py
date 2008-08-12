@@ -304,9 +304,13 @@ class Mul(Basic):
 
     def __hash__(self):
         if self.mhash is None:
-            a = list(self.args[:])
-            a.sort(key=hash)
-            h = hash_seq(a)
+            # in contrast to Add, here it is faster:
+            self.freeze_args()
+            h = hash(self._args_set)
+            # this is slower:
+            #a = list(self.args[:])
+            #a.sort(key=hash)
+            #h = hash_seq(a)
             self.mhash = h
             return h
         else:
