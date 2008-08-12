@@ -186,7 +186,6 @@ class Add(Basic):
         if len(d)==0:
             return num
         args = []
-        #print d
         for a, b in d.iteritems():
             args.append(Mul((a, b)))
         if num.i != 0:
@@ -215,9 +214,9 @@ class Add(Basic):
 
     def __hash__(self):
         a = list(self.args[:])
-        a.sort(key=hash)
+        # XXX: for some reason, the the sorting below is *not* necessary.
+        #a.sort(key=hash)
         return hash_seq(a)
-        return hash(frozenset(self.args))
 
     def expand(self):
         r = Integer(0)
@@ -276,9 +275,9 @@ class Mul(Basic):
 
     def __hash__(self):
         a = list(self.args[:])
-        a.sort(key=hash)
+        # XXX: for some reason, the the sorting below is *not* necessary.
+        #a.sort(key=hash)
         return hash_seq(a)
-        return hash(frozenset(self.args))
 
     def __eq__(self, o):
         o = sympify(o)

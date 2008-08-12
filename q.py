@@ -28,9 +28,3 @@ d = {}
 d[e1] = 1
 print e1 in d
 print e2 in d
-
-e1 = 2*z*x*x**y*5
-e2 = 2*x**y*5*x*z
-
-print e1
-print e2
