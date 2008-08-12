@@ -11,12 +11,13 @@ else:
         print 'I: import sympy_pyx ...',
         from sympy_pyx import *
 
-    except ImportError:
+    except ImportError, e:
         print
+        print '   %s' % e
         print 'W: can\'t import sympy_pyx -- will be pure python'
-        xy_gather_line = xy_gather_line_py
 
     else:
+        print 'ok'
         _mode = 'pyx'
 
 
