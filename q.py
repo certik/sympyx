@@ -1,3 +1,4 @@
+from timeit import default_timer as clock
 from csympy import HashTable
 from sympy import *
 
@@ -6,10 +7,14 @@ y = Symbol("y")
 z = Symbol("z")
 a = Symbol("x")
 
-e = (1 + y + x + z)**2
+e = (1 + y + x + z)**8
 
-f = e*(e+1)
+#f = e*(e+1)
+f = e
 
 print f
+t = clock()
 g = f.expand()
-print g
+t = clock() - t
+print len(g.args)
+print t
