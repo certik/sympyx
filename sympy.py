@@ -15,15 +15,6 @@ def hash_seq(args):
         m = hash(m + 1001 ^ hash(x))
     return m
 
-def compare_lists(a, b):
-    """
-    Compare two sequences.
-
-    Sequences are equal even with a *different* order of elements.
-    """
-
-    return set(a) == set(b)
-
 class Basic(object):
 
     def __new__(cls, type, args):
