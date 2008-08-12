@@ -17,8 +17,8 @@ a = Symbol("x")
 #print ( (x+z)*(x+y)**2 ).expand()
 
 #print x*y+x+y+x**2 == y*x + x + y + x**2
-e1 = z+x+y*x
-e2 = x*y+x+z
+e1 = 1+z+x+y*x+5
+e2 = 1+x*y+5+x+z
 f = e1.args
 g = e2.args
 print f

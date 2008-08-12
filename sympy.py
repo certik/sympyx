@@ -169,11 +169,14 @@ class Add(Basic):
                 num += a
             elif a.type == ADD:
                 for b in a.args:
-                    coeff, key = b.as_coeff_rest()
-                    if key in d:
-                        d[key] += coeff
+                    if b.type == INTEGER:
+                        num += b
                     else:
-                        d[key] = coeff
+                        coeff, key = b.as_coeff_rest()
+                        if key in d:
+                            d[key] += coeff
+                        else:
+                            d[key] = coeff
             else:
                 coeff, key = a.as_coeff_rest()
                 if key in d:

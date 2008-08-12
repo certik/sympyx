@@ -45,6 +45,11 @@ def test_add():
     assert x + x == Integer(2) * x
     assert ((x + y) + z) + x == (Integer(2)*x + y) + z
 
+    e1 = 1+z+x+y*x+5
+    e2 = 1+x*y+5+x+z
+    assert e1 == e2
+    assert e2 == 6+x+z+x*y
+
 def test_mul():
     x = Symbol("x")
     y = Symbol("y")
