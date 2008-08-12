@@ -233,6 +233,11 @@ class Add(Basic):
 
     def __hash__(self):
         if self.mhash is None:
+            # XXX: it is surprising, but this is *not* faster:
+            #self.freeze_args()
+            #h = hash(self._args_set)
+
+            # this is faster:
             a = list(self.args[:])
             a.sort(key=hash)
             h = hash_seq(a)
