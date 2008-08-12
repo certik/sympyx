@@ -1,18 +1,37 @@
-all: csympy.so
 
-CFLAGS=-g
-#CFLAGS=-O3
-PYVER=2.5
 
-csympy.c: csympy.pyx
-	cython --convert-range csympy.pyx
+PYTHON	:= python
+CYTHON	:= cython --convert-range
+CC	:= gcc
+CFLAGS	:= \
+    	$(shell $(PYTHON)-config --includes)	\
+    	$(shell pkg-config glib-2.0 --cflags)
 
-csympy.o: csympy.c
-	gcc -fPIC $(CFLAGS) -I/usr/include/python$(PYVER) -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include/ -c -o csympy.o csympy.c
+LIBS	:= -lglib-2.0
 
-csympy.so: csympy.o
-	gcc -shared csympy.o -o csympy.so -lglib-2.0
+CFLAGS	+= -g	# -O3
+
+
+all	: csympy.so
+
+
+
+
+# rules
+%.c	: %.pyx
+	$(CYTHON) $<
+
+%.o	: %.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
+
+
+%.so	: %.o
+	$(CC) $(LDFLAGS) -shared $+ -o $@ $(LIBS)
+
+# keep those *.o and *.so files
+.SECONDARY:
 
 clean:
-	rm -f csympy.so csympy.o csympy.c csympy_api.h
+	rm -f *.so *.pyd *.o csympy.c csympy_api.h
 	rm -f *.pyc
+
