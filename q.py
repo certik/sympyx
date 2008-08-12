@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from timeit import default_timer as clock
 from csympy import HashTable
 from sympy import *
@@ -16,6 +17,6 @@ print f
 t = clock()
 g = f.expand()
 t = clock() - t
-print len(g.args)
-print t
+print '#args: %i' % len(g.args)
+print 'time:  %f' % t
 #print g == x+y
