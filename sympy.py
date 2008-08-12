@@ -214,8 +214,7 @@ class Add(Basic):
 
     def __hash__(self):
         a = list(self.args[:])
-        # XXX: for some reason, the the sorting below is *not* necessary.
-        #a.sort(key=hash)
+        a.sort(key=hash)
         return hash_seq(a)
 
     def expand(self):
@@ -275,8 +274,7 @@ class Mul(Basic):
 
     def __hash__(self):
         a = list(self.args[:])
-        # XXX: for some reason, the the sorting below is *not* necessary.
-        #a.sort(key=hash)
+        a.sort(key=hash)
         return hash_seq(a)
 
     def __eq__(self, o):
