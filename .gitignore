@@ -1,0 +1,9 @@
+csympy.c
+
+*.swp
+*.o
+*.so
+*.pyd
+*.pyc
+
+tags
