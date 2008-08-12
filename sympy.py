@@ -248,14 +248,14 @@ class Mul(Basic):
                 num *= a
             elif a.type == MUL:
                 for b in a.args:
-                    key, coeff = b.as_base_exp()
-                    if key.type == INTEGER and coeff.type == INTEGER:
+                    if b.type == INTEGER:
                         num *= b
-                        continue
-                    if key in d:
-                        d[key] += coeff
                     else:
-                        d[key] = coeff
+                        key, coeff = b.as_base_exp()
+                        if key in d:
+                            d[key] += coeff
+                        else:
+                            d[key] = coeff
             else:
                 key, coeff = a.as_base_exp()
                 if key in d:
