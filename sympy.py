@@ -335,9 +335,13 @@ class Mul(Basic):
 
     def expand(self):
         a, b = self.as_two_terms()
-        a = a.expand()
-        b = b.expand()
-        return Mul.expand_two(a, b)
+        r = Mul.expand_two(a, b)
+        if r == self:
+            a = a.expand()
+            b = b.expand()
+            return Mul.expand_two(a, b)
+        else:
+            return r.expand()
 
 class Pow(Basic):
 

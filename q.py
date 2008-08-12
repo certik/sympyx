@@ -6,25 +6,10 @@ y = Symbol("y")
 z = Symbol("z")
 a = Symbol("x")
 
-#h = HashTable()
-#h[x+1] = 3
-#h.insert(x, 3)
-#h.insert(3, x**2)
-#print h[x+1]
-#print x+2 in h
-#
-#print ( x*(x+y)**2 + z*(x+y)**2 ).expand()
-#print ( (x+z)*(x+y)**2 ).expand()
+e = (1 + y + x + z)**2
 
-#print x*y+x+y+x**2 == y*x + x + y + x**2
-e1 = 1+z+x+y*x+5
-e2 = 1+x*y+5+x+z
-f = e1.args
-g = e2.args
+f = e*(e+1)
+
 print f
+g = f.expand()
 print g
-print set(f) == set(g)
-d = {}
-d[e1] = 1
-print e1 in d
-print e2 in d
