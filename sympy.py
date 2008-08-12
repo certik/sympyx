@@ -172,6 +172,7 @@ class Add(Basic):
     def __new__(cls, args, canonicalize=True):
         if canonicalize == False:
             obj = Basic.__new__(cls, ADD, args)
+            obj._args_set = None
             return obj
         args = [sympify(x) for x in args]
         return Add.canonicalize(args)
@@ -216,10 +217,16 @@ class Add(Basic):
         else:
             return Add(args, False)
 
+    def freeze_args(self):
+        if self._args_set is None:
+            self._args_set = set(self.args)
+
     def __eq__(self, o):
         o = sympify(o)
         if o.type == ADD:
-            return compare_lists(self.args, o.args)
+            self.freeze_args()
+            o.freeze_args()
+            return self._args_set == o._args_set
         else:
             return False
 
@@ -254,6 +261,7 @@ class Mul(Basic):
     def __new__(cls, args, canonicalize=True):
         if canonicalize == False:
             obj = Basic.__new__(cls, MUL, args)
+            obj._args_set = None
             return obj
         args = [sympify(x) for x in args]
         return Mul.canonicalize(args)
@@ -308,10 +316,16 @@ class Mul(Basic):
         else:
             return self.mhash
 
+    def freeze_args(self):
+        if self._args_set is None:
+            self._args_set = set(self.args)
+
     def __eq__(self, o):
         o = sympify(o)
         if o.type == MUL:
-            return compare_lists(self.args, o.args)
+            self.freeze_args()
+            o.freeze_args()
+            return self._args_set == o._args_set
         else:
             return False
 
