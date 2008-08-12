@@ -210,6 +210,12 @@ class Add(Basic):
                 s = "(%s)" % s
         return s
 
+    def __hash__(self):
+        a = list(self.args[:])
+        a.sort(key=hash)
+        return hash_seq(a)
+        return hash(frozenset(self.args))
+
     def expand(self):
         r = Integer(0)
         for term in self.args:

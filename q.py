@@ -24,3 +24,7 @@ g = e2.args
 print f
 print g
 print set(f) == set(g)
+d = {}
+d[e1] = 1
+print e1 in d
+print e2 in d

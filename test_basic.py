@@ -188,3 +188,15 @@ def test_hash2():
     assert x*y-y*x == 0
     assert x*y+y*a == 2*x*y
     assert x*y-y*a == 0
+
+def test_hash3():
+    x = Symbol("x")
+    y = Symbol("y")
+    z = Symbol("z")
+    e1 = z+x+y*x
+    e2 = x*y+x+z
+
+    d = {}
+    d[e1] = 1
+    assert e1 in d
+    assert e2 in d
