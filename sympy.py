@@ -431,9 +431,9 @@ class Pow(Basic):
         if base.type == ADD and exp.type == INTEGER:
             n = exp.i
             m = len(base.args)
-            print "multi"
+            #print "multi"
             d = multinomial_coefficients(m, n)
-            print "assembly"
+            #print "assembly"
             r = []
             for powers, coeff in d.iteritems():
                 if coeff == 1:
@@ -450,7 +450,7 @@ class Pow(Basic):
                     t = Mul(t, False)
                 r.append(t)
             r = Add(r, False)
-            print "done"
+            #print "done"
             return r
         return self
 
