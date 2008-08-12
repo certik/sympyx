@@ -433,8 +433,8 @@ class Pow(Basic):
             m = len(base.args)
             print "multi"
             d = multinomial_coefficients(m, n)
-            r = Integer(0)
             print "assembly"
+            r = []
             for powers, coeff in d.iteritems():
                 if coeff == 1:
                     t = []
@@ -448,13 +448,8 @@ class Pow(Basic):
                     t = t[0]
                 else:
                     t = Mul(t, False)
-                if r.type == ADD:
-                    add_args = list(r.args) + [t]
-                    # XXX: this needs to be checked, i.e. for some more
-                    # complicated examples one should still simplify things
-                    r = Add(add_args, False)
-                else:
-                    r = r + t
+                r.append(t)
+            r = Add(r, False)
             print "done"
             return r
         return self
