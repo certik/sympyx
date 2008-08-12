@@ -387,10 +387,8 @@ class Pow(Basic):
         if base.type == ADD and exp.type == INTEGER:
             n = exp.i
             m = len(base.args)
-            print "multi:", m, n
             d = multinomial_coefficients(m, n)
             r = Integer(0)
-            print "assembly"
             for powers, coeff in d.iteritems():
                 t = [Integer(coeff)]
                 for x, p in zip(base.args, powers):
@@ -403,7 +401,6 @@ class Pow(Basic):
                     r = Add(add_args, False)
                 else:
                     r = r + t
-            print "done"
             return r
         return self
 

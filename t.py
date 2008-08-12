@@ -14,28 +14,11 @@ def doit1(e):
     f = f.expand()
     return f
 
-def doit2(e):
-    e1 = e**2
-    e = e.expand()
-    e1 = e1.expand()
-    t = clock()
-    f = e + e1
-    t = clock() - t
-    return f, t
-
 e = (x+y+z+1)**N
 
-print "1:"
-#t_tot1 = clock()
-#a1 = doit1(e)
-#t_tot1 = clock()-t_tot1
-print "2:"
 t_tot = clock()
-a2, t = doit2(e)
+a2 = doit1(e)
 t_tot = clock()-t_tot
-
-#e = e*(e+1)
-#f = e.expand()
 
 print "done"
 
@@ -43,15 +26,9 @@ t_mul = clock()
 a= multinomial_coefficients(4, N)
 b= multinomial_coefficients(4, 2*N)
 t_mul = clock() - t_mul
-#print "a1: ", a1
-#print "a2: ", a2
-#print "a1 == a2: ", a1 == a2
-#print "hash(a1) == hash(a2)", hash(a1) == hash(a2)
 print e
 print "# of terms:", len(a2.args)
-print "time spent doing e+e2:", t
 print "time doing multinomial_coefficients:", t_mul
-#print "total time1:", t_tot1
 print "total time2:", t_tot
 
 
