@@ -6,11 +6,28 @@ POW     = 4
 INTEGER = 5
 
 def hash_seq(args):
+    """
+    Hash of a sequence, that *depends* on the order of elements.
+    """
     # make this more robust:
     m = 2
     for x in args:
         m = hash(m + 1001 ^ hash(x))
     return m
+
+def compare_lists(a, b):
+    """
+    Compare two sequences.
+
+    Sequences are equal even with a *different* order of elements.
+    """
+
+    a = list(a[:])
+    b = list(b[:])
+    # this is not bullet proff if two expressions have the same hash.
+    a.sort(key=hash)
+    b.sort(key=hash)
+    return a == b
 
 class Basic(object):
 
@@ -171,6 +188,7 @@ class Add(Basic):
         if len(d)==0:
             return num
         args = []
+        #print d
         for a, b in d.iteritems():
             args.append(Mul((a, b)))
         if num.i != 0:
@@ -183,11 +201,7 @@ class Add(Basic):
     def __eq__(self, o):
         o = sympify(o)
         if o.type == ADD:
-            a = list(self.args[:])
-            a.sort(key=hash)
-            b = list(o.args[:])
-            b.sort(key=hash)
-            return a == b
+            return compare_lists(self.args, o.args)
         else:
             return False
 
@@ -264,11 +278,7 @@ class Mul(Basic):
     def __eq__(self, o):
         o = sympify(o)
         if o.type == MUL:
-            a = list(self.args[:])
-            a.sort(key=hash)
-            b = list(o.args[:])
-            b.sort(key=hash)
-            return a == b
+            return compare_lists(self.args, o.args)
         else:
             return False
 
