@@ -62,6 +62,11 @@ def test_mul():
     assert x * x == x ** Integer(2)
     assert ((x * y) * z) * x == ((x ** Integer(2)) * y) * z
 
+    e1 = 2*z*x*y**x*5
+    e2 = 2*y**x*5*x*z
+    assert e1 == e2
+    assert e2 == 10*x*z*y**x
+
 def test_arit():
     x = Symbol("x")
     y = Symbol("y")
