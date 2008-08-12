@@ -22,12 +22,7 @@ def compare_lists(a, b):
     Sequences are equal even with a *different* order of elements.
     """
 
-    a = list(a[:])
-    b = list(b[:])
-    # this is not bullet proff if two expressions have the same hash.
-    a.sort(key=hash)
-    b.sort(key=hash)
-    return a == b
+    return set(a) == set(b)
 
 class Basic(object):
 

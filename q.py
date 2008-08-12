@@ -19,6 +19,8 @@ a = Symbol("x")
 #print x*y+x+y+x**2 == y*x + x + y + x**2
 e1 = z+x+y*x
 e2 = x*y+x+z
-print e1.args
-print e2.args
-print e1 == e2
+f = e1.args
+g = e2.args
+print f
+print g
+print set(f) == set(g)
