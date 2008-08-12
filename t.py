@@ -3,7 +3,7 @@ from timeit import default_timer as clock
 from sympy import Symbol, Add, Mul, Integer, ADD, MUL, POW, INTEGER, SYMBOL, \
         multinomial_coefficients
 
-N = 4
+N = 10
 
 x = Symbol("x")
 y = Symbol("y")

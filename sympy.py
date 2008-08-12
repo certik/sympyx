@@ -398,7 +398,7 @@ class Pow(Basic):
                 t = Mul(t)
                 if r.type == ADD:
                     add_args = list(r.args) + [t]
-                    r = Add(add_args, True)
+                    r = Add(add_args, False)
                 else:
                     r = r + t
             print "done"
