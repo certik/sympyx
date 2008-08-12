@@ -396,7 +396,11 @@ class Pow(Basic):
                 for x, p in zip(base.args, powers):
                     t.append(Pow((x, p)))
                 t = Mul(t)
-                r = Add((r, t))
+                if r.type == ADD:
+                    add_args = list(r.args) + [t]
+                    r = Add(add_args, True)
+                else:
+                    r = r + t
             print "done"
             return r
         return self
