@@ -209,8 +209,10 @@ class Add(Basic):
             return Add(args, False)
 
     def freeze_args(self):
+        #print "add is freezing"
         if self._args_set is None:
             self._args_set = frozenset(self.args)
+        #print "done"
 
     def __eq__(self, o):
         o = sympify(o)
@@ -317,8 +319,10 @@ class Mul(Basic):
             return self.mhash
 
     def freeze_args(self):
+        #print "mul is freezing"
         if self._args_set is None:
             self._args_set = frozenset(self.args)
+        #print "done"
 
     def __eq__(self, o):
         o = sympify(o)
@@ -427,13 +431,23 @@ class Pow(Basic):
         if base.type == ADD and exp.type == INTEGER:
             n = exp.i
             m = len(base.args)
+            print "multi"
             d = multinomial_coefficients(m, n)
             r = Integer(0)
+            print "assembly"
             for powers, coeff in d.iteritems():
-                t = [Integer(coeff)]
+                if coeff == 1:
+                    t = []
+                else:
+                    t = [Integer(coeff)]
                 for x, p in zip(base.args, powers):
-                    t.append(Pow((x, p)))
-                t = Mul(t)
+                    if p != 0:
+                        t.append(Pow((x, p)))
+                assert len(t) != 0
+                if len(t) == 1:
+                    t = t[0]
+                else:
+                    t = Mul(t, False)
                 if r.type == ADD:
                     add_args = list(r.args) + [t]
                     # XXX: this needs to be checked, i.e. for some more
@@ -441,6 +455,7 @@ class Pow(Basic):
                     r = Add(add_args, False)
                 else:
                     r = r + t
+            print "done"
             return r
         return self
 

@@ -7,7 +7,7 @@ y = Symbol("y")
 z = Symbol("z")
 a = Symbol("x")
 
-e = (1 + y + x + z)**8
+e = (1 + y + x + z)**50
 
 #f = e*(e+1)
 f = e
@@ -18,3 +18,4 @@ g = f.expand()
 t = clock() - t
 print len(g.args)
 print t
+#print g == x+y
