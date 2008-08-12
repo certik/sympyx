@@ -3,7 +3,7 @@ from timeit import default_timer as clock
 from sympy import Symbol, Add, Mul, Integer, ADD, MUL, POW, INTEGER, SYMBOL, \
         multinomial_coefficients
 
-N = 2
+N = 3
 
 x = Symbol("x")
 y = Symbol("y")
@@ -48,6 +48,7 @@ t_mul = clock() - t_mul
 print "a1: ", a1
 print "a2: ", a2
 print "a1 == a2: ", a1 == a2
+print "hash(a1) == hash(a2)", hash(a1) == hash(a2)
 print e
 print "# of terms:", len(a2.args)
 print "time spent doing e+e2:", t

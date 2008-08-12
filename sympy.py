@@ -162,7 +162,12 @@ class Add(Basic):
 
     @classmethod
     def canonicalize(cls, args):
-        d = {}
+        use_glib = 0
+        if use_glib:
+            from csympy import HashTable
+            d = HashTable()
+        else:
+            d = {}
         num = Integer(0)
         for a in args:
             if a.type == INTEGER:
