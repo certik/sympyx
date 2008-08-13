@@ -48,7 +48,7 @@ cdef int hash_seq(args):
 
 
 cdef class Basic:
-    cdef int    type
+    cdef int    _type
     cdef int    hash
     cdef tuple  _args   # XXX tuple -> list?
 
@@ -70,6 +70,10 @@ cdef class Basic:
     @property
     def args(self):
         return self._args
+
+    @property
+    def type(self):
+        return self._type
 
     # XXX struct2
     cpdef as_coeff_rest(self):
@@ -108,13 +112,13 @@ cdef class Basic:
     # in subclasses, you can be sure that _equal(a, b) is called with exactly
     # the same type, e.g.
     #
-    # when _Add._equal(a, b) is called a and b are of .type=ADD for sure
+    # when _Add._equal(a, b) is called a and b are of ._type=ADD for sure
     cdef int _equal(Basic self, Basic o):
         # by default we compare ._args
         return self._args == o._args
 
     cdef bint equal(Basic self, Basic o):
-        if self.type != o.type:
+        if self._type != o._type:
             return 0
 
         # now we know self and o are of the same type, lets dispatch to their
@@ -147,7 +151,7 @@ cdef class _Integer(Basic):
     cdef object i   # XXX object -> pyint?
 
     def __cinit__(self, i):
-        self.type = INTEGER
+        self._type = INTEGER
         self.i    = i
 
     cdef int _hash(self):
@@ -168,7 +172,7 @@ cdef class _Integer(Basic):
     def __add__(_a, _b):
         cdef Basic a = sympify(_a)
         cdef Basic b = sympify(_b)
-        if a.type == INTEGER and b.type == INTEGER:
+        if a._type == INTEGER and b._type == INTEGER:
             return Integer( (<_Integer>a).i + (<_Integer>b).i )
 
         return Basic.__add__(a, b)
@@ -177,7 +181,7 @@ cdef class _Integer(Basic):
     def __mul__(_a, _b):
         cdef Basic a = sympify(_a)
         cdef Basic b = sympify(_b)
-        if a.type == INTEGER and b.type == INTEGER:
+        if a._type == INTEGER and b._type == INTEGER:
             return Integer( (<_Integer>a).i * (<_Integer>b).i )
         return Basic.__mul__(a, b)
 
@@ -193,7 +197,7 @@ cdef class _Symbol(Basic):
     cdef object name    # XXX object -> str
 
     def __cinit__(self, name):
-        self.type = SYMBOL
+        self._type = SYMBOL
         self.name = name
 
     cdef int _hash(self):
@@ -237,11 +241,11 @@ cdef Basic _Add_canonicalize(args):
     cdef Basic key
 
     for a in args:
-        if a.type == INTEGER:
+        if a._type == INTEGER:
             num += a
-        elif a.type == ADD:
+        elif a._type == ADD:
             for b in a._args:
-                if b.type == INTEGER:
+                if b._type == INTEGER:
                     num += b
                 else:
                     coeff, key = b.as_coeff_rest()
@@ -272,7 +276,7 @@ cdef class _Add(Basic):
     cdef object  _args_set  # XXX object -> frozenset
 
     def __cinit__(_Add self, args):
-        self.type   = ADD
+        self._type   = ADD
         self._args  = tuple(args)
 
 
@@ -294,11 +298,11 @@ cdef class _Add(Basic):
     def __str__(Basic self):
         cdef Basic a = self._args[0]
         s = str(a)
-        if a.type == ADD:
+        if a._type == ADD:
             s = "(%s)" % str(s)
         for a in self._args[1:]:
             s = "%s + %s" % (s, str(a))
-            if a.type == ADD:
+            if a._type == ADD:
                 s = "(%s)" % s
         return s
 
@@ -339,11 +343,11 @@ cdef Basic _Mul_canonicalize(args):
     cdef _Integer num = Integer(1)
 
     for a in args:
-        if a.type == INTEGER:
+        if a._type == INTEGER:
             num *= a
-        elif a.type == MUL:
+        elif a._type == MUL:
             for b in a._args:
-                if b.type == INTEGER:
+                if b._type == INTEGER:
                     num *= b
                 else:
                     key, coeff = b.as_base_exp()
@@ -380,18 +384,18 @@ cdef Basic _Mul_expand_two(Basic a, Basic b):
     cdef Basic x
     cdef Basic y
 
-    if a.type == ADD and b.type == ADD:
+    if a._type == ADD and b._type == ADD:
         terms = []
         for x in a._args:
             for y in b._args:
                 terms.append(x*y)
         return Add(terms)
-    if a.type == ADD:
+    if a._type == ADD:
         terms = []
         for x in a._args:
             terms.append(x*b)
         return Add(terms)
-    if b.type == ADD:
+    if b._type == ADD:
         terms = []
         for y in b._args:
             terms.append(a*y)
@@ -402,7 +406,7 @@ cdef class _Mul(Basic):
     cdef object _args_set   # XXX object -> frozenset
 
     def __cinit__(self, args):
-        self.type = MUL
+        self._type = MUL
         self._args= tuple(args)
         self._args_set = None
 
@@ -434,7 +438,7 @@ cdef class _Mul(Basic):
     cpdef as_coeff_rest(self):
         cdef Basic a = self._args[0]
 
-        if a.type == INTEGER:
+        if a._type == INTEGER:
             return self.as_two_terms()
         return (Integer(1), self)
 
@@ -453,10 +457,10 @@ cdef class _Mul(Basic):
     def __str__(self):
         cdef Basic a = self._args[0]
         s = str(a)
-        if a.type in [ADD, MUL]:
+        if a._type in [ADD, MUL]:
             s = "(%s)" % str(s)
         for a in self._args[1:]:
-            if a.type in [ADD, MUL]:
+            if a._type in [ADD, MUL]:
                 s = "%s * (%s)" % (s, str(a))
             else:
                 s = "%s*%s" % (s, str(a))
@@ -490,17 +494,17 @@ cdef Basic _Pow_canonicalize(args):
     cdef _Integer b = <_Integer>base
     cdef _Integer e = <_Integer>exp
 
-    if base.type == INTEGER:
+    if base._type == INTEGER:
         if b.i == 0:
             return b    # Integer(0)
         if b.i == 1:
             return b    # Integer(1)
-    if exp.type == INTEGER:
+    if exp._type == INTEGER:
         if e.i == 0:
             return Integer(1)
         if e.i == 1:
             return base
-    if base.type == POW:
+    if base._type == POW:
         return Pow((base._args[0], base._args[1]*exp))
     return _Pow(args)
 
@@ -509,17 +513,17 @@ cdef Basic _Pow_canonicalize(args):
 cdef class _Pow(Basic):
 
     def __cinit__(self, args):
-        self.type = POW
+        self._type = POW
         self._args= tuple(args)
 
     def __str__(_Pow self):
         cdef Basic b = self._args[0]
         cdef Basic e = self._args[1]
         s = str(b)
-        if b.type == ADD:
+        if b._type == ADD:
             s = "(%s)" % s
 
-        if e.type == ADD:
+        if e._type == ADD:
             s = "%s^(%s)" % (s, str(e))
         else:
             s = "%s^%s" % (s, str(e))
@@ -544,7 +548,7 @@ cdef class _Pow(Basic):
         cdef Basic term
         cdef Basic ret
 
-        if _base.type == ADD and _exp.type == INTEGER:
+        if _base._type == ADD and _exp._type == INTEGER:
             n = exp.i
             m = len(base._args)
             #print "multi"

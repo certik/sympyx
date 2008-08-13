@@ -11,6 +11,14 @@ else:
         print 'I: import sympy_pyx ...',
         from sympy_pyx import *
 
+        # XXX figure out how to put this into sympy_pyx.pyx:
+        BASIC   = 0
+        SYMBOL  = 1
+        ADD     = 2
+        MUL     = 3
+        POW     = 4
+        INTEGER = 5
+
     except ImportError, e:
         print
         print '   %s' % e
