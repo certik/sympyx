@@ -25,3 +25,15 @@ if _mode == 'pyx':
     from sympy_pyx import *
 else:
     from sympy_py import *
+
+
+
+# for debugging
+x = Symbol('x')
+y = Symbol('y')
+i = Integer(2)
+
+x2= Symbol('x')
+
+
+e = (x+y)**2
