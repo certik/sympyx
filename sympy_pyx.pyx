@@ -220,16 +220,21 @@ cpdef Basic Add(args):
 
 # @staticmethod
 cdef Basic _Add_canonicalize(args):
-    use_glib = 0
-    if use_glib:
-        from csympy import HashTable
-        d = HashTable()
-    else:
-        d = {}
+#   use_glib = 0
+#   if use_glib:
+#       from csympy import HashTable
+#       d = HashTable()
+#   else:
+#       d = {}
+
+    cdef dict d = {}
 
     cdef Basic a
     cdef Basic b
     cdef _Integer num = Integer(0)
+
+    cdef Basic coeff
+    cdef Basic key
 
     for a in args:
         if a.type == INTEGER:
@@ -319,12 +324,14 @@ cpdef Basic Mul(args):
 
 
 cdef Basic _Mul_canonicalize(args):
-    use_glib = 0
-    if use_glib:
-        from csympy import HashTable
-        d = HashTable()
-    else:
-        d = {}
+#   use_glib = 0
+#   if use_glib:
+#       from csympy import HashTable
+#       d = HashTable()
+#   else:
+#       d = {}
+
+    cdef dict d = {}
 
     cdef Basic a
     cdef Basic b
@@ -369,6 +376,8 @@ cdef Basic _Mul_expand_two(Basic a, Basic b):
     Both a and b are assumed to be expanded.
     """
     cdef Basic r
+    cdef Basic x
+    cdef Basic y
 
     if a.type == ADD and b.type == ADD:
         r = Integer(0)
@@ -428,8 +437,16 @@ cdef class _Mul(Basic):
             return self.as_two_terms()
         return (Integer(1), self)
 
-    def as_two_terms(self):
-        return (self._args[0], Mul(self._args[1:]))
+    # XXX struct2
+    cpdef as_two_terms(_Mul self):
+        cdef Basic a0 = self._args[0]
+        if len(self._args) == 2:
+            return a0, self._args[1]
+
+        else:
+            # XXX _Mul is ok here (like ._new_rawargs)
+            return (self._args[0], _Mul(self._args[1:]))
+                                                        
 
 
     def __str__(self):
@@ -445,7 +462,10 @@ cdef class _Mul(Basic):
         return s
 
 
-    def expand(self):
+    cpdef Basic expand(self):
+        cdef Basic a
+        cdef Basic b
+        cdef Basic r
         a, b = self.as_two_terms()
         r = _Mul_expand_two(a, b)
         if r == self:
@@ -516,6 +536,13 @@ cdef class _Pow(Basic):
         cdef _Add     base = <_Add>_base
         cdef _Integer exp  = <_Integer>_exp
 
+        cdef int p
+
+        cdef list r
+        cdef list t
+        cdef Basic term
+        cdef Basic ret
+
         if _base.type == ADD and _exp.type == INTEGER:
             n = exp.i
             m = len(base._args)
@@ -531,15 +558,17 @@ cdef class _Pow(Basic):
                 for x, p in zip(base._args, powers):
                     if p != 0:
                         t.append(Pow((x, p)))
+                        #t.append(_Pow((x, Integer(p))))  # XXX _Pow -> Pow
                 assert len(t) != 0
                 if len(t) == 1:
-                    t = t[0]
+                    term = t[0]
                 else:
-                    t = _Mul(t)
-                r.append(t)
-            r = _Add(r)
+                    term = _Mul(t)
+                r.append(term)
+
+            ret = _Add(r)
             #print "done"
-            return r
+            return ret
 
         return self
 

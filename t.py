@@ -16,8 +16,7 @@ def doit1(e):
 e = (x+y+z+1)**N
 
 t_tot = clock()
-for i in range(10):
-    a2 = doit1(e)
+a2 = doit1(e)
 t_tot = clock()-t_tot
 
 print "done"
