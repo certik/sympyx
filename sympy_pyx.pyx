@@ -1,9 +1,9 @@
-DEF BASIC   = 0
-DEF SYMBOL  = 1
-DEF ADD     = 2
-DEF MUL     = 3
-DEF POW     = 4
-DEF INTEGER = 5
+BASIC   = 0
+SYMBOL  = 1
+ADD     = 2
+MUL     = 3
+POW     = 4
+INTEGER = 5
 
 def hash_seq(args):
     """
@@ -15,25 +15,25 @@ def hash_seq(args):
         m = hash(m + 1001 ^ hash(x))
     return m
 
-cdef class Basic:
+class Basic(object):
 
-    cdef int    type
-    cdef tuple  _args
-
-    cdef int    _hash
-
-
-    def __cinit__(Basic self):
-        self._hash = -1
+    def __new__(cls, type, args):
+        obj = object.__new__(cls)
+        obj.type = type
+        obj._args = tuple(args)
+        obj.mhash = None
+        return obj
 
     def __repr__(self):
         return str(self)
 
-    def __hash__(Basic self):
-        if self._hash == -1:
-            self._hash = hash_seq(self.args)
-
-        return self._hash
+    def __hash__(self):
+        if self.mhash is None:
+            h = hash_seq(self.args)
+            self.mhash = h
+            return h
+        else:
+            return self.mhash
 
     @property
     def args(self):
@@ -48,7 +48,7 @@ cdef class Basic:
     def expand(self):
         return self
 
-    def __add__(Basic x, y):
+    def __add__(x, y):
         return Add((x, y))
 
     def __radd__(x, y):
@@ -72,8 +72,7 @@ cdef class Basic:
     def __rdiv__(x, y):
         return Mul((y, Pow((x, Integer(-1)))))
 
-    # XXX we should get rid of z
-    def __pow__(x, y, z):
+    def __pow__(x, y):
         return Pow((x, y))
 
     def __rpow__(x, y):
@@ -85,132 +84,89 @@ cdef class Basic:
     def __pos__(x):
         return x
 
+    def __ne__(self, x):
+        return not self.__eq__(x)
 
-    cdef int equal(Basic self, Basic o):
-        if self.type != o.type:
-            return 0
-
-        return (self.args == o.args)
-
-
-
-    def __richcmp__(Basic x, y, int op):
-        y = sympify(y)
-
-        # eq
-        if op==2:
-            return x.equal(y)
-
-        # ne
-        elif op==3:
-            return not x.equal(y)
-
-
+    def __eq__(self, o):
+        o = sympify(o)
+        if o.type == self.type:
+            return self.args == o.args
         else:
-            return NotImplemented   # XXX ok?
+            return False
 
 
-cpdef Basic Integer(i):
-    return _Integer(i)
+class Integer(Basic):
 
+    def __new__(cls, i):
+        obj = Basic.__new__(cls, INTEGER, [])
+        obj.i = i
+        return obj
 
-cdef class _Integer(Basic):
-    cdef readonly object i  # XXX object -> pyint ?
+    def __hash__(self):
+        if self.mhash is None:
+            h = hash(self.i)
+            self.mhash = h
+            return h
+        else:
+            return self.mhash
 
-    def __cinit__(self, i):
-        self.type = INTEGER
-        self._args= ()
-        self.i    = i
-
-    def __hash__(_Integer self):
-        # TODO we have to cache it
-        return hash(self.i)
-
-
-    cdef int _equal(_Integer self, _Integer o):
-        return self.i == o.i
-
-#   def __eq__(self, o):
-#       o = sympify(o)
-#       if o.type == INTEGER:
-#           return self.i == o.i
-#       else:
-#           return False
+    def __eq__(self, o):
+        o = sympify(o)
+        if o.type == INTEGER:
+            return self.i == o.i
+        else:
+            return False
 
     def __str__(self):
         return str(self.i)
 
-    def __repr__(self):
-        return 'Integer(%i)' % self.i
-
-    def __add__(_Integer self, other):
-        cdef Basic o = sympify(other)
+    def __add__(self, o):
+        o = sympify(o)
         if o.type == INTEGER:
             return Integer(self.i+o.i)
         return Basic.__add__(self, o)
 
-    def __mul__(_Integer self, other):
-        cdef Basic o = sympify(other)
+    def __mul__(self, o):
+        o = sympify(o)
         if o.type == INTEGER:
             return Integer(self.i*o.i)
         return Basic.__mul__(self, o)
 
 
-Symbol = Symbol__new__
+class Symbol(Basic):
 
-
-# XXX Cython does not support __new__
-cpdef Basic Symbol__new__(name):
-    obj = _Symbol(name)
-    return obj
-
-cdef class _Symbol(Basic):
-    cdef readonly object name    # XXX object -> string
-
-    def __cinit__(self, name):
-        self.type = SYMBOL
-        self._args= tuple()
-        self.name = name
+    def __new__(cls, name):
+        obj = Basic.__new__(cls, SYMBOL, [])
+        obj.name = name
+        return obj
 
     def __hash__(self):
-        # TODO we have to cache it
-        return hash(self.name)
+        if self.mhash is None:
+            h = hash(self.name)
+            self.mhash = h
+            return h
+        else:
+            return self.mhash
 
-    # TODO we have to hook it into .equal
-    cdef int xequal(_Symbol self, _Symbol o):
-        return self.name == o.name
-
-#   def __eq__(self, o):
-#       o = sympify(o)
-#       if o.type == SYMBOL:
-#           return self.name == o.name
-#       return False
+    def __eq__(self, o):
+        o = sympify(o)
+        if o.type == SYMBOL:
+            return self.name == o.name
+        return False
 
     def __str__(self):
         return self.name
 
-    def __repr__(self):
-        return 'Symbol(%s)' % self.name
 
+class Add(Basic):
 
-
-# Add.__new__
-cpdef Basic Add(args, canonicalize=True):
-    if canonicalize == False:
-        return _Add(args)
-    else:
+    def __new__(cls, args, canonicalize=True):
+        if canonicalize == False:
+            obj = Basic.__new__(cls, ADD, args)
+            obj._args_set = None
+            return obj
         args = [sympify(x) for x in args]
-        return _Add.canonicalize(args)
-
-
-
-cdef class _Add(Basic):
-    cdef object  _args_set  # XXX object -> frozenset
-
-    def __cinit__(_Add self, tuple args):
-        self.type   = ADD
-        self._args  = args
-
+        return Add.canonicalize(args)
 
     @classmethod
     def canonicalize(cls, args):
@@ -220,9 +176,7 @@ cdef class _Add(Basic):
             d = HashTable()
         else:
             d = {}
-
-        cdef Basic a
-        cdef Basic num = Integer(0)
+        num = Integer(0)
         for a in args:
             if a.type == INTEGER:
                 num += a
@@ -260,22 +214,14 @@ cdef class _Add(Basic):
             self._args_set = frozenset(self.args)
         #print "done"
 
-    cdef int _equal(_Add self, _Add o):
-        # TODO ensure o is _Add too
-        self.freeze_args()
-        o   .freeze_args()
-
-        return self._args_set == o._args_set
-
-#   def __eq__(self, o):
-#       o = sympify(o)
-#       if o.type == ADD:
-#           self.freeze_args()
-#           o.freeze_args()
-#           return self._args_set == o._args_set
-#       else:
-#           return False
-
+    def __eq__(self, o):
+        o = sympify(o)
+        if o.type == ADD:
+            self.freeze_args()
+            o.freeze_args()
+            return self._args_set == o._args_set
+        else:
+            return False
 
     def __str__(self):
         s = str(self.args[0])
@@ -308,24 +254,15 @@ cdef class _Add(Basic):
             r += term.expand()
         return r
 
+class Mul(Basic):
 
-# Mul.__new__
-cpdef Basic Mul(args, canonicalize=True):
-    if canonicalize == False:
-        return _Mul(tuple(args))
-
-    args = [sympify(x) for x in args]
-    return _Mul.canonicalize(args)
-
-
-cdef class _Mul(Basic):
-    cdef object _args_set   # XXX object -> frozenset
-
-    def __cinit__(self, args):
-        self.type = MUL
-        self._args= args
-        self._args_set = None
-
+    def __new__(cls, args, canonicalize=True):
+        if canonicalize == False:
+            obj = Basic.__new__(cls, MUL, args)
+            obj._args_set = None
+            return obj
+        args = [sympify(x) for x in args]
+        return Mul.canonicalize(args)
 
     @classmethod
     def canonicalize(cls, args):
@@ -335,10 +272,7 @@ cdef class _Mul(Basic):
             d = HashTable()
         else:
             d = {}
-
-        cdef Basic num = Integer(1)
-        cdef Basic a
-
+        num = Integer(1)
         for a in args:
             if a.type == INTEGER:
                 num *= a
@@ -390,22 +324,14 @@ cdef class _Mul(Basic):
             self._args_set = frozenset(self.args)
         #print "done"
 
-#   def __eq__(self, o):
-#       o = sympify(o)
-#       if o.type == MUL:
-#           self.freeze_args()
-#           o.freeze_args()
-#           return self._args_set == o._args_set
-#       else:
-#           return False
-
-
-    cdef int _equal(_Mul self, _Mul o):
-        # XXX ensure o is Mul
-        # XXX compare len first
-        self.freeze_args()
-        o   .freeze_args()
-        return self._args_set == o._args_set
+    def __eq__(self, o):
+        o = sympify(o)
+        if o.type == MUL:
+            self.freeze_args()
+            o.freeze_args()
+            return self._args_set == o._args_set
+        else:
+            return False
 
 
     def as_coeff_rest(self):
@@ -417,12 +343,9 @@ cdef class _Mul(Basic):
         return (self.args[0], Mul(self.args[1:]))
 
 
-    def __str__(_Mul self):
+    def __str__(self):
         s = str(self.args[0])
-
-        cdef Basic x = self.args[0]
-
-        if x.type in [ADD, MUL]:
+        if self.args[0].type in [ADD, MUL]:
             s = "(%s)" % str(s)
         for x in self.args[1:]:
             if x.type in [ADD, MUL]:
@@ -456,33 +379,25 @@ cdef class _Mul(Basic):
 
     def expand(self):
         a, b = self.as_two_terms()
-        r = _Mul.expand_two(a, b)
+        r = Mul.expand_two(a, b)
         if r == self:
             a = a.expand()
             b = b.expand()
-            return _Mul.expand_two(a, b)
+            return Mul.expand_two(a, b)
         else:
             return r.expand()
 
+class Pow(Basic):
 
-cpdef Basic Pow(args, canonicalize=True):
-    if canonicalize == False:
-        return _Pow(tuple(args))
-
-    args = [sympify(x) for x in args]
-    return _Pow.canonicalize(args)
-
-cdef class _Pow(Basic):
-
-    def __cinit__(self, args):
-        self.type = POW
-        self._args= args
-
+    def __new__(cls, args, canonicalize=True):
+        if canonicalize == False:
+            obj = Basic.__new__(cls, POW, args)
+            return obj
+        args = [sympify(x) for x in args]
+        return Pow.canonicalize(args)
 
     @classmethod
     def canonicalize(cls, args):
-        cdef Basic base
-        cdef Basic exp
         base, exp = args
         if base.type == INTEGER:
             if base.i == 0:
@@ -544,6 +459,60 @@ def sympify(x):
         return Integer(x)
     return x
 
+def var(s):
+    """
+        Create a symbolic variable with the name *s*.
+
+        INPUT:
+            s -- a string, either a single variable name, or
+                 a space separated list of variable names, or
+                 a list of variable names.
+
+        NOTE: The new variable is both returned and automatically injected into
+        the parent's *global* namespace.  It's recommended not to use "var" in
+        library code, it is better to use symbols() instead.
+
+        EXAMPLES:
+        We define some symbolic variables:
+            >>> var('m')
+            m
+            >>> var('n xx yy zz')
+            (n, xx, yy, zz)
+            >>> n
+            n
+
+    """
+    import re
+    import inspect
+    frame = inspect.currentframe().f_back
+
+    try:
+        if not isinstance(s, list):
+            s = re.split('\s|,', s)
+
+        res = []
+
+        for t in s:
+            # skip empty strings
+            if not t:
+                continue
+            sym = Symbol(t)
+            frame.f_globals[t] = sym
+            res.append(sym)
+
+        res = tuple(res)
+        if len(res) == 0:   # var('')
+            res = None
+        elif len(res) == 1: # var('x')
+            res = res[0]
+                            # otherwise var('a b ...')
+        return res
+
+    finally:
+        # we should explicitly break cyclic dependencies as stated in inspect
+        # doc
+        #del frame
+        pass
 
 def binomial_coefficients(n):
     """Return a dictionary containing pairs {(k1,k2) : C_kn} where

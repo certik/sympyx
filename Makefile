@@ -1,7 +1,7 @@
 
 
 PYTHON	:= python
-CYTHON	:= cython --convert-range
+CYTHON	:= python ../cython-devel/cython.py --convert-range
 CC	:= gcc
 CFLAGS	:= \
     	$(shell $(PYTHON)-config --includes)	\
