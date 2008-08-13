@@ -9,7 +9,7 @@ CFLAGS	:= \
 
 LIBS	:= -lglib-2.0
 
-CFLAGS	+= -g -O0	# -O3
+CFLAGS	+= -g -O0 -fPIC # -O3
 
 
 all	: csympy.so sympy_pyx.so
