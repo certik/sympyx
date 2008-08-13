@@ -85,7 +85,6 @@ cdef class Basic:
         return x
 
     def equal(self, o):
-        o = sympify(o)
         if o.type == self.type:
             return self.args == o.args
         else:
