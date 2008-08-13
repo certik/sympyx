@@ -380,11 +380,11 @@ class _Mul(_Basic):
 
     def expand(self):
         a, b = self.as_two_terms()
-        r = Mul.expand_two(a, b)
+        r = _Mul.expand_two(a, b)
         if r == self:
             a = a.expand()
             b = b.expand()
-            return Mul.expand_two(a, b)
+            return _Mul.expand_two(a, b)
         else:
             return r.expand()
 
