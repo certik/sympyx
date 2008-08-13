@@ -7,4 +7,10 @@ y = Symbol("y")
 z = Symbol("z")
 a = Symbol("x")
 
-print x+x
+e = (x+y+z+1)**10
+e = e*(e+1)
+t = clock()
+f = e.expand()
+t = clock() - t
+print len(f.args)
+print t
