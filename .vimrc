@@ -1,2 +1,2 @@
 map <F9> :!make<CR>
-"map <F10> :!./basic<CR>
+map <F10> :!./q.py<CR>
