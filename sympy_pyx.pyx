@@ -230,7 +230,7 @@ class _Add(_Basic):
             self._args_set = frozenset(self.args)
         #print "done"
 
-    def __eq__(self, o):
+    def equal(self, o):
         o = sympify(o)
         if o.type == ADD:
             self.freeze_args()
@@ -341,7 +341,7 @@ class _Mul(_Basic):
             self._args_set = frozenset(self.args)
         #print "done"
 
-    def __eq__(self, o):
+    def equal(self, o):
         o = sympify(o)
         if o.type == MUL:
             self.freeze_args()
