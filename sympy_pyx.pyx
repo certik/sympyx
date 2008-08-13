@@ -35,12 +35,12 @@ DEF MUL     = 3
 DEF POW     = 4
 DEF INTEGER = 5
 
-def hash_seq(args):
+cdef int hash_seq(args):
     """
     Hash of a sequence, that *depends* on the order of elements.
     """
     # make this more robust:
-    m = 2
+    cdef int m = 2
     for x in args:
         m = hash(m + 1001 ^ hash(x))
     return m
@@ -49,28 +49,30 @@ def hash_seq(args):
 
 cdef class Basic:
     cdef int    type
-    cdef int    _hash
+    cdef int    hash
     cdef tuple  _args   # XXX tuple -> list?
 
     def __cinit__(self):
-        self._hash = -1
+        self.hash = -1
 
     def __repr__(self):
         return str(self)
 
     def __hash__(self):
-        if self.mhash is None:
-            h = hash_seq(self.args)
-            self.mhash = h
-            return h
-        else:
-            return self.mhash
+        if self.hash == -1:
+            self.hash = self._hash()
+
+        return self.hash
+
+    cdef int _hash(self):
+            return hash_seq(self.args)
 
     @property
     def args(self):
         return self._args
 
-    def as_coeff_rest(self):
+    # XXX struct2
+    cpdef as_coeff_rest(self):
         return (Integer(1), self)
 
     def as_base_exp(self):
@@ -82,24 +84,28 @@ cdef class Basic:
     def __add__(x, y):
         return Add((x, y))
 
+    # XXX there is no __radd__ in pyrex
     def __radd__(x, y):
         return x.__add__(y)
 
     def __sub__(x, y):
         return Add((x, -y))
 
+    # XXX no __rsub__
     def __rsub__(x, y):
         return Add((y, -x))
 
     def __mul__(x, y):
         return Mul((x, y))
 
+    # XXX no __rmul__
     def __rmul__(x, y):
         return Mul((y, x))
 
     def __div__(x, y):
         return Mul((x, Pow((y, Integer(-1)))))
 
+    # XXX no __rdiv__
     def __rdiv__(x, y):
         return Mul((y, Pow((x, Integer(-1)))))
 
@@ -107,6 +113,7 @@ cdef class Basic:
     def __pow__(x, y, z):
         return Pow((x, y))
 
+    # XXX no __rpow__
     def __rpow__(x, y):
         return Pow((y, x))
 
@@ -121,9 +128,10 @@ cdef class Basic:
     #
     # when _Add._equal(a, b) is called a and b are of .type=ADD for sure
     cdef int _equal(Basic self, Basic o):
-        return 1    # XXX should we compare args here?
+        # by default we compare .args
+        return self._args == o.args
 
-    cdef int equal(Basic self, Basic o):
+    cdef bint equal(Basic self, Basic o):
         if self.type != o.type:
             return 0
 
@@ -134,7 +142,7 @@ cdef class Basic:
 
 
     def __richcmp__(Basic x, y, int op):
-        print '__richcmp__ %s %s %i' % (x,y,op)
+        #print '__richcmp__ %s %s %i' % (x,y,op)
         y = sympify(y)
 
         # eq
@@ -160,13 +168,8 @@ cdef class _Integer(Basic):
         self.type = INTEGER
         self.i    = i
 
-    def __hash__(self):
-        if self._hash is None:
-            h = hash(self.i)
-            self._hash = h
-            return h
-        else:
-            return self._hash
+    cdef int _hash(self):
+        return hash(self.i)
 
     cdef int _equal(_Integer self, Basic o):
         cdef _Integer other = <_Integer>o
@@ -179,17 +182,22 @@ cdef class _Integer(Basic):
     def __repr__(_Integer self):
         return 'Integer(%i)' % self.i
 
-    def __add__(_Integer self, other):
-        cdef Basic o = sympify(other)
-        if o.type == INTEGER:
-            return Integer(self.i+(<_Integer>o).i)
-        return Basic.__add__(self, o)
+    # there is no __radd__ in pyrex
+    def __add__(_a, _b):
+        cdef Basic a = sympify(_a)
+        cdef Basic b = sympify(_b)
+        if a.type == INTEGER and b.type == INTEGER:
+            return Integer( (<_Integer>a).i + (<_Integer>b).i )
 
-    def __mul__(_Integer self, other):
-        cdef Basic o = sympify(other)
-        if o.type == INTEGER:
-            return Integer(self.i*(<_Integer>o).i)
-        return Basic.__mul__(self, o)
+        return Basic.__add__(a, b)
+
+    # there is no __rmul__ in pyrex
+    def __mul__(_a, _b):
+        cdef Basic a = sympify(_a)
+        cdef Basic b = sympify(_b)
+        if a.type == INTEGER and b.type == INTEGER:
+            return Integer( (<_Integer>a).i * (<_Integer>b).i )
+        return Basic.__mul__(a, b)
 
 
 
@@ -206,13 +214,12 @@ cdef class _Symbol(Basic):
         self.type = SYMBOL
         self.name = name
 
-    def __hash__(self):
-        # TODO we have to cache it
+    cdef int _hash(self):
         return hash(self.name)
 
     cdef int _equal(_Symbol self, Basic o):
         cdef _Symbol other = <_Symbol>o
-        print 'Symbol._equal %s %s' % (self.name, other.name)
+        #print 'Symbol._equal %s %s' % (self.name, other.name)
         return self.name == other.name
 
     def __str__(_Symbol self):
@@ -242,7 +249,9 @@ cdef Basic _Add_canonicalize(args):
         d = {}
 
     cdef Basic a
+    cdef Basic b
     cdef _Integer num = Integer(0)
+
     for a in args:
         if a.type == INTEGER:
             num += a
@@ -309,20 +318,15 @@ cdef class _Add(Basic):
                 s = "(%s)" % s
         return s
 
-    def __hash__(self):
-        if self.mhash is None:
-            # XXX: it is surprising, but this is *not* faster:
-            #self.freeze_args()
-            #h = hash(self._args_set)
+    cdef int _hash(self):
+        # XXX: it is surprising, but this is *not* faster:
+        #self.freeze_args()
+        #h = hash(self._args_set)
 
-            # this is faster:
-            a = list(self.args[:])
-            a.sort(key=hash)
-            h = hash_seq(a)
-            self.mhash = h
-            return h
-        else:
-            return self.mhash
+        # this is faster:
+        a = list(self.args[:])
+        a.sort(key=hash)
+        return hash_seq(a)
 
     def expand(self):
         r = Integer(0)
@@ -346,8 +350,9 @@ cdef Basic _Mul_canonicalize(args):
     else:
         d = {}
 
-    cdef _Integer num = Integer(1)
     cdef Basic a
+    cdef Basic b
+    cdef _Integer num = Integer(1)
 
     for a in args:
         if a.type == INTEGER:
@@ -381,6 +386,32 @@ cdef Basic _Mul_canonicalize(args):
         return Mul(args, False)
 
 
+
+# @staticmethod
+cdef Basic _Mul_expand_two(Basic a, Basic b):
+    """
+    Both a and b are assumed to be expanded.
+    """
+    cdef Basic r
+
+    if a.type == ADD and b.type == ADD:
+        r = Integer(0)
+        for x in a.args:
+            for y in b.args:
+                r += x*y
+        return r
+    if a.type == ADD:
+        r = Integer(0)
+        for x in a.args:
+            r += x*b
+        return r
+    if b.type == ADD:
+        r = Integer(0)
+        for y in b.args:
+            r += a*y
+        return r
+    return a*b
+
 cdef class _Mul(Basic):
     cdef object _args_set   # XXX object -> frozenset
 
@@ -390,19 +421,15 @@ cdef class _Mul(Basic):
         self._args_set = None
 
 
-    def __hash__(self):
-        if self.mhash is None:
-            # in contrast to Add, here it is faster:
-            self.freeze_args()
-            h = hash(self._args_set)
-            # this is slower:
-            #a = list(self.args[:])
-            #a.sort(key=hash)
-            #h = hash_seq(a)
-            self.mhash = h
-            return h
-        else:
-            return self.mhash
+    cdef int _hash(self):
+        # in contrast to Add, here it is faster:
+        self.freeze_args()
+        return hash(self._args_set)
+        # this is slower:
+        #a = list(self.args[:])
+        #a.sort(key=hash)
+        #h = hash_seq(a)
+        #return h
 
     def freeze_args(self):
         #print "mul is freezing"
@@ -418,8 +445,10 @@ cdef class _Mul(Basic):
         return self._args_set == other._args_set
 
 
-    def as_coeff_rest(self):
-        if self.args[0].type == INTEGER:
+    cpdef as_coeff_rest(self):
+        cdef Basic a = self.args[0]
+
+        if a.type == INTEGER:
             return self.as_two_terms()
         return (Integer(1), self)
 
@@ -439,36 +468,14 @@ cdef class _Mul(Basic):
                 s = "%s*%s" % (s, str(a))
         return s
 
-    @classmethod
-    def expand_two(self, a, b):
-        """
-        Both a and b are assumed to be expanded.
-        """
-        if a.type == ADD and b.type == ADD:
-            r = Integer(0)
-            for x in a.args:
-                for y in b.args:
-                    r += x*y
-            return r
-        if a.type == ADD:
-            r = Integer(0)
-            for x in a.args:
-                r += x*b
-            return r
-        if b.type == ADD:
-            r = Integer(0)
-            for y in b.args:
-                r += a*y
-            return r
-        return a*b
 
     def expand(self):
         a, b = self.as_two_terms()
-        r = _Mul.expand_two(a, b)
+        r = _Mul_expand_two(a, b)
         if r == self:
             a = a.expand()
             b = b.expand()
-            return _Mul.expand_two(a, b)
+            return _Mul_expand_two(a, b)
         else:
             return r.expand()
 
@@ -528,11 +535,14 @@ cdef class _Pow(Basic):
         return self.args
 
     cpdef Basic expand(_Pow self):
-        # XXX careful with types here
-        cdef _Add       base = self.args[0]
-        cdef _Integer   exp  = self.args[1]
+        cdef Basic  _base = self.args[0]
+        cdef Basic  _exp  = self.args[1]
 
-        if base.type == ADD and exp.type == INTEGER:
+        # XXX please careful here - use it only after appropriate check
+        cdef _Add     base = <_Add>_base
+        cdef _Integer exp  = <_Integer>_exp
+
+        if _base.type == ADD and _exp.type == INTEGER:
             n = exp.i
             m = len(base.args)
             #print "multi"

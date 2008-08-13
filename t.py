@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 from timeit import default_timer as clock
-from sympy import Symbol, Add, Mul, Integer, ADD, MUL, POW, INTEGER, SYMBOL, \
-        multinomial_coefficients
+from sympy import Symbol, Add, Mul, Integer, multinomial_coefficients
 
 N = 10
 
@@ -31,6 +30,7 @@ print "# of terms:", len(a2.args)
 print "time doing multinomial_coefficients:", t_mul
 print "total time2:", t_tot
 
+from sympy import ADD, MUL, POW, INTEGER, SYMBOL
 
 def csympy2sympy(a):
     import sympy
