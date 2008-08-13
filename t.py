@@ -30,23 +30,23 @@ print "# of terms:", len(a2.args)
 print "time doing multinomial_coefficients:", t_mul
 print "total time2:", t_tot
 
-from sympy import ADD, MUL, POW, INTEGER, SYMBOL
-
-def csympy2sympy(a):
-    import sympy
-    if a.type == ADD:
-        return sympy.Add(*[csympy2sympy(x) for x in a.args])
-    elif a.type == MUL:
-        return sympy.Mul(*[csympy2sympy(x) for x in a.args])
-    elif a.type == POW:
-        return sympy.Pow(*[csympy2sympy(x) for x in a.args])
-    elif a.type == INTEGER:
-        return sympy.sympify(str(a))
-    elif a.type == SYMBOL:
-        return sympy.sympify(str(a))
-    print a
-    raise NotImplementedError("sorry")
-
+#from sympy import ADD, MUL, POW, INTEGER, SYMBOL
+#
+#def csympy2sympy(a):
+#    import sympy
+#    if a.type == ADD:
+#        return sympy.Add(*[csympy2sympy(x) for x in a.args])
+#    elif a.type == MUL:
+#        return sympy.Mul(*[csympy2sympy(x) for x in a.args])
+#    elif a.type == POW:
+#        return sympy.Pow(*[csympy2sympy(x) for x in a.args])
+#    elif a.type == INTEGER:
+#        return sympy.sympify(str(a))
+#    elif a.type == SYMBOL:
+#        return sympy.sympify(str(a))
+#    print a
+#    raise NotImplementedError("sorry")
+#
 #e_sympy = csympy2sympy(e)
 #a2_sympy = doit2(e_sympy)[0]
 #a2_csympy = csympy2sympy(a2)
