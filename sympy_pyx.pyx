@@ -17,7 +17,7 @@ def hash_seq(args):
 
 
 
-cdef class _Basic:
+cdef class Basic:
 
     def __init__(obj, type, args):
         obj.type = type
@@ -91,7 +91,7 @@ cdef class _Basic:
         else:
             return False
 
-    def __richcmp__(_Basic self, o, int op):
+    def __richcmp__(Basic self, o, int op):
         o = sympify(o)
         if op == 2:
             return self.equal(o)
@@ -107,7 +107,7 @@ def Integer(i):
     return obj
 
 
-class _Integer(_Basic):
+class _Integer(Basic):
 
     def __hash__(self):
         if self.mhash is None:
@@ -131,13 +131,13 @@ class _Integer(_Basic):
         o = sympify(o)
         if o.type == INTEGER:
             return Integer(self.i+o.i)
-        return _Basic.__add__(self, o)
+        return Basic.__add__(self, o)
 
     def __mul__(self, o):
         o = sympify(o)
         if o.type == INTEGER:
             return Integer(self.i*o.i)
-        return _Basic.__mul__(self, o)
+        return Basic.__mul__(self, o)
 
 def Symbol(name):
     obj = _Symbol(SYMBOL, [])
@@ -145,7 +145,7 @@ def Symbol(name):
     return obj
 
 
-class _Symbol(_Basic):
+class _Symbol(Basic):
 
     def __hash__(self):
         if self.mhash is None:
@@ -172,7 +172,7 @@ def Add(args, canonicalize=True):
     args = [sympify(x) for x in args]
     return _Add.canonicalize(args)
 
-class _Add(_Basic):
+class _Add(Basic):
 
 
     @classmethod
@@ -270,7 +270,7 @@ def Mul(args, canonicalize=True):
     return _Mul.canonicalize(args)
 
 
-class _Mul(_Basic):
+class _Mul(Basic):
 
     @classmethod
     def canonicalize(cls, args):
@@ -403,7 +403,7 @@ def Pow(args, canonicalize=True):
     return _Pow.canonicalize(args)
 
 
-class _Pow(_Basic):
+class _Pow(Basic):
 
     @classmethod
     def canonicalize(cls, args):
