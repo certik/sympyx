@@ -68,7 +68,7 @@ cdef class Basic:
             return hash_seq(self._args)
 
     @property
-    def xargs(self):
+    def args(self):
         return self._args
 
     # XXX struct2
