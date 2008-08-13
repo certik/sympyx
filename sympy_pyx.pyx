@@ -81,41 +81,23 @@ cdef class Basic:
     def expand(self):
         return self
 
+    # NOTE: there is no __rxxx__ methods in Cython/Pyrex
+
     def __add__(x, y):
         return Add((x, y))
-
-    # XXX there is no __radd__ in pyrex
-    def __radd__(x, y):
-        return x.__add__(y)
 
     def __sub__(x, y):
         return Add((x, -y))
 
-    # XXX no __rsub__
-    def __rsub__(x, y):
-        return Add((y, -x))
-
     def __mul__(x, y):
         return Mul((x, y))
-
-    # XXX no __rmul__
-    def __rmul__(x, y):
-        return Mul((y, x))
 
     def __div__(x, y):
         return Mul((x, Pow((y, Integer(-1)))))
 
-    # XXX no __rdiv__
-    def __rdiv__(x, y):
-        return Mul((y, Pow((x, Integer(-1)))))
-
     # FIXME we should get rid of z?
     def __pow__(x, y, z):
         return Pow((x, y))
-
-    # XXX no __rpow__
-    def __rpow__(x, y):
-        return Pow((y, x))
 
     def __neg__(x):
         return Mul((Integer(-1), x))
