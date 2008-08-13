@@ -94,13 +94,13 @@ class _Basic(object):
         else:
             return False
 
+def Integer(i):
+    obj = _Integer(INTEGER, [])
+    obj.i = i
+    return obj
 
-class Integer(_Basic):
 
-    def __new__(cls, i):
-        obj = _Basic.__new__(cls, INTEGER, [])
-        obj.i = i
-        return obj
+class _Integer(_Basic):
 
     def __hash__(self):
         if self.mhash is None:
@@ -157,16 +157,16 @@ class _Symbol(_Basic):
     def __str__(self):
         return self.name
 
+def Add(args, canonicalize=True):
+    if canonicalize == False:
+        obj = _Add(ADD, args)
+        obj._args_set = None
+        return obj
+    args = [sympify(x) for x in args]
+    return _Add.canonicalize(args)
 
-class Add(_Basic):
+class _Add(_Basic):
 
-    def __new__(cls, args, canonicalize=True):
-        if canonicalize == False:
-            obj = _Basic.__new__(cls, ADD, args)
-            obj._args_set = None
-            return obj
-        args = [sympify(x) for x in args]
-        return Add.canonicalize(args)
 
     @classmethod
     def canonicalize(cls, args):
@@ -254,15 +254,16 @@ class Add(_Basic):
             r += term.expand()
         return r
 
-class Mul(_Basic):
+def Mul(args, canonicalize=True):
+    if canonicalize == False:
+        obj = _Mul(MUL, args)
+        obj._args_set = None
+        return obj
+    args = [sympify(x) for x in args]
+    return _Mul.canonicalize(args)
 
-    def __new__(cls, args, canonicalize=True):
-        if canonicalize == False:
-            obj = _Basic.__new__(cls, MUL, args)
-            obj._args_set = None
-            return obj
-        args = [sympify(x) for x in args]
-        return Mul.canonicalize(args)
+
+class _Mul(_Basic):
 
     @classmethod
     def canonicalize(cls, args):
@@ -387,14 +388,15 @@ class Mul(_Basic):
         else:
             return r.expand()
 
-class Pow(_Basic):
+def Pow(args, canonicalize=True):
+    if canonicalize == False:
+        obj = _Pow(POW, args)
+        return obj
+    args = [sympify(x) for x in args]
+    return _Pow.canonicalize(args)
 
-    def __new__(cls, args, canonicalize=True):
-        if canonicalize == False:
-            obj = _Basic.__new__(cls, POW, args)
-            return obj
-        args = [sympify(x) for x in args]
-        return Pow.canonicalize(args)
+
+class _Pow(_Basic):
 
     @classmethod
     def canonicalize(cls, args):
