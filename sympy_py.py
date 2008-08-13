@@ -340,7 +340,13 @@ class Mul(Basic):
         return (Integer(1), self)
 
     def as_two_terms(self):
-        return (self.args[0], Mul(self.args[1:]))
+        args = self.args
+        a0   = args[0]
+
+        if len(args) == 2:
+            return a0, args[1]
+        else:
+            return (a0, Mul(args[1:], False))
 
 
     def __str__(self):
