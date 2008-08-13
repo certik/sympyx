@@ -18,12 +18,12 @@ def hash_seq(args):
 
 
 cdef class Basic:
-    #cdef int type
+    cdef int _type
     cdef long long int mhash
     #cdef tuple _args
 
-    def __init__(obj, type, args):
-        obj.type = type
+    def __init__(obj, _type, args):
+        obj._type = _type
         obj._args = tuple(args)
         obj.mhash = -1
 
@@ -37,6 +37,10 @@ cdef class Basic:
             return h
         else:
             return self.mhash
+
+    @property
+    def type(self):
+        return self._type
 
     @property
     def args(self):
@@ -87,8 +91,8 @@ cdef class Basic:
     def __pos__(x):
         return x
 
-    def equal(self, o):
-        if o.type == self.type:
+    def equal(self, Basic o):
+        if o._type == self._type:
             return self.args == o.args
         else:
             return False
@@ -112,8 +116,8 @@ def Integer(i):
 class _Integer(Basic):
     #cdef int i
 
-    #def __init__(self, type, args):
-    #    Basic.__init__(self, type, args)
+    #def __init__(self, _type, args):
+    #    Basic.__init__(self, _type, args)
 
     def __hash__(Basic self):
         if self.mhash == -1:
@@ -123,8 +127,8 @@ class _Integer(Basic):
         else:
             return self.mhash
 
-    def equal(self, o):
-        if o.type == INTEGER:
+    def equal(self, Basic o):
+        if o._type == INTEGER:
             return self.i == o.i
         else:
             return False
@@ -132,15 +136,17 @@ class _Integer(Basic):
     def __str__(self):
         return str(self.i)
 
-    def __add__(self, o):
-        o = sympify(o)
-        if o.type == INTEGER:
+    def __add__(self, a):
+        cdef Basic o
+        o = sympify(a)
+        if o._type == INTEGER:
             return Integer(self.i+o.i)
         return Basic.__add__(self, o)
 
-    def __mul__(self, o):
-        o = sympify(o)
-        if o.type == INTEGER:
+    def __mul__(self, a):
+        cdef Basic o
+        o = sympify(a)
+        if o._type == INTEGER:
             return Integer(self.i*o.i)
         return Basic.__mul__(self, o)
 
@@ -160,8 +166,8 @@ class _Symbol(Basic):
         else:
             return self.mhash
 
-    def equal(self, o):
-        if o.type == SYMBOL:
+    def equal(self, Basic o):
+        if o._type == SYMBOL:
             return self.name == o.name
         return False
 
@@ -188,12 +194,13 @@ class _Add(Basic):
         else:
             d = {}
         num = Integer(0)
+        cdef Basic a, b
         for a in args:
-            if a.type == INTEGER:
+            if a._type == INTEGER:
                 num += a
-            elif a.type == ADD:
+            elif a._type == ADD:
                 for b in a.args:
-                    if b.type == INTEGER:
+                    if b._type == INTEGER:
                         num += b
                     else:
                         coeff, key = b.as_coeff_rest()
@@ -225,8 +232,8 @@ class _Add(Basic):
             self._args_set = frozenset(self.args)
         #print "done"
 
-    def equal(self, o):
-        if o.type == ADD:
+    def equal(self, Basic o):
+        if o._type == ADD:
             self.freeze_args()
             o.freeze_args()
             return self._args_set == o._args_set
@@ -235,11 +242,13 @@ class _Add(Basic):
 
     def __str__(self):
         s = str(self.args[0])
-        if self.args[0].type == ADD:
+        cdef Basic x
+        x = self.args[0]
+        if x._type == ADD:
             s = "(%s)" % str(s)
         for x in self.args[1:]:
             s = "%s + %s" % (s, str(x))
-            if x.type == ADD:
+            if x._type == ADD:
                 s = "(%s)" % s
         return s
 
@@ -284,12 +293,13 @@ class _Mul(Basic):
         else:
             d = {}
         num = Integer(1)
+        cdef Basic a, b
         for a in args:
-            if a.type == INTEGER:
+            if a._type == INTEGER:
                 num *= a
-            elif a.type == MUL:
+            elif a._type == MUL:
                 for b in a.args:
-                    if b.type == INTEGER:
+                    if b._type == INTEGER:
                         num *= b
                     else:
                         key, coeff = b.as_base_exp()
@@ -335,8 +345,8 @@ class _Mul(Basic):
             self._args_set = frozenset(self.args)
         #print "done"
 
-    def equal(self, o):
-        if o.type == MUL:
+    def equal(self, Basic o):
+        if o._type == MUL:
             self.freeze_args()
             o.freeze_args()
             return self._args_set == o._args_set
@@ -345,7 +355,8 @@ class _Mul(Basic):
 
 
     def as_coeff_rest(self):
-        if self.args[0].type == INTEGER:
+        cdef Basic a = self.args[0]
+        if a._type == INTEGER:
             return self.as_two_terms()
         return (Integer(1), self)
 
@@ -355,32 +366,32 @@ class _Mul(Basic):
 
     def __str__(self):
         s = str(self.args[0])
-        if self.args[0].type in [ADD, MUL]:
+        if self.args[0]._type in [ADD, MUL]:
             s = "(%s)" % str(s)
         for x in self.args[1:]:
-            if x.type in [ADD, MUL]:
+            if x._type in [ADD, MUL]:
                 s = "%s * (%s)" % (s, str(x))
             else:
                 s = "%s*%s" % (s, str(x))
         return s
 
     @classmethod
-    def expand_two(self, a, b):
+    def expand_two(self, Basic a, Basic b):
         """
         Both a and b are assumed to be expanded.
         """
-        if a.type == ADD and b.type == ADD:
+        if a._type == ADD and b._type == ADD:
             r = Integer(0)
             for x in a.args:
                 for y in b.args:
                     r += x*y
             return r
-        if a.type == ADD:
+        if a._type == ADD:
             r = Integer(0)
             for x in a.args:
                 r += x*b
             return r
-        if b.type == ADD:
+        if b._type == ADD:
             r = Integer(0)
             for y in b.args:
                 r += a*y
@@ -409,26 +420,30 @@ class _Pow(Basic):
 
     @classmethod
     def canonicalize(cls, args):
+        cdef Basic base, exp
         base, exp = args
-        if base.type == INTEGER:
+        if base._type == INTEGER:
             if base.i == 0:
                 return Integer(0)
             if base.i == 1:
                 return Integer(1)
-        if exp.type == INTEGER:
+        if exp._type == INTEGER:
             if exp.i == 0:
                 return Integer(1)
             if exp.i == 1:
                 return base
-        if base.type == POW:
+        if base._type == POW:
             return Pow((base.args[0], base.args[1]*exp))
         return Pow(args, False)
 
     def __str__(self):
         s = str(self.args[0])
-        if self.args[0].type == ADD:
+        cdef Basic x
+        x = self.args[0]  
+        if x._type == ADD:
             s = "(%s)" % s
-        if self.args[1].type == ADD:
+        x = self.args[1]
+        if x._type == ADD:
             s = "%s^(%s)" % (s, str(self.args[1]))
         else:
             s = "%s^%s" % (s, str(self.args[1]))
@@ -438,8 +453,9 @@ class _Pow(Basic):
         return self.args
 
     def expand(self):
+        cdef Basic base, exp
         base, exp = self.args
-        if base.type == ADD and exp.type == INTEGER:
+        if base._type == ADD and exp._type == INTEGER:
             n = exp.i
             m = len(base.args)
             #print "multi"
