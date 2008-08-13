@@ -84,16 +84,6 @@ cdef class _Basic:
     def __pos__(x):
         return x
 
-    #def __ne__(self, x):
-    #    return not self.__eq__(x)
-
-    #def __eq__(self, o):
-    #    o = sympify(o)
-    #    if o.type == self.type:
-    #        return self.args == o.args
-    #    else:
-    #        return False
-
     def equal(self, o):
         o = sympify(o)
         if o.type == self.type:
