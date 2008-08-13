@@ -473,10 +473,8 @@ cdef class _Mul(Basic):
         else:
             return r.expand()
 
-def Pow(args, canonicalize=True):
-    if canonicalize == False:
-        return _Pow(args)
-
+# Pow.__new__
+cpdef Basic Pow(args):
     args = [sympify(x) for x in args]
     return _Pow_canonicalize(args)
 
@@ -501,7 +499,7 @@ cdef Basic _Pow_canonicalize(args):
             return base
     if base.type == POW:
         return Pow((base.args[0], base.args[1]*exp))
-    return Pow(args, False)
+    return _Pow(args)
 
 
 
