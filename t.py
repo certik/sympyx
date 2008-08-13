@@ -16,7 +16,8 @@ def doit1(e):
 e = (x+y+z+1)**N
 
 t_tot = clock()
-a2 = doit1(e)
+for i in range(10):
+    a2 = doit1(e)
 t_tot = clock()-t_tot
 
 print "done"
@@ -24,9 +25,11 @@ print "done"
 t_mul = clock()
 a= multinomial_coefficients(4, N)
 b= multinomial_coefficients(4, 2*N)
+a.items()
+b.items()
 t_mul = clock() - t_mul
 print e
-print "# of terms:", len(a2.args)
+print "# of terms:", len(a2.xargs)
 print "time doing multinomial_coefficients:", t_mul
 print "total time2:", t_tot
 

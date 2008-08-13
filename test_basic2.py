@@ -55,16 +55,16 @@ def xtest_basic_nostr():
 
 def test_len():
     e = x*y
-    assert len(e.args) == 2
+    assert len(e.xargs) == 2
     e = x+y+z
-    assert len(e.args) == 3
+    assert len(e.xargs) == 3
 
 def test_args():
-    assert (x*y).args[:] in ((x, y), (y, x))
-    assert (x+y).args[:] in ((x, y), (y, x))
-    assert (x*y+1).args[:] in ((x*y, 1), (1, x*y))
-    #assert sin(x*y).args[:] == (x*y,)
-    #assert sin(x*y).args[0] == x*y
-    assert (x**y).args[:] == (x,y)
-    assert (x**y).args[0] == x
-    assert (x**y).args[1] == y
+    assert (x*y).xargs[:] in ((x, y), (y, x))
+    assert (x+y).xargs[:] in ((x, y), (y, x))
+    assert (x*y+1).xargs[:] in ((x*y, 1), (1, x*y))
+    #assert sin(x*y).xargs[:] == (x*y,)
+    #assert sin(x*y).xargs[0] == x*y
+    assert (x**y).xargs[:] == (x,y)
+    assert (x**y).xargs[0] == x
+    assert (x**y).xargs[1] == y

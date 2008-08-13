@@ -65,17 +65,17 @@ cdef class Basic:
         return self.hash
 
     cdef int _hash(self):
-            return hash_seq(self.args)
+            return hash_seq(self._args)
 
     @property
-    def args(self):
+    def xargs(self):
         return self._args
 
     # XXX struct2
     cpdef as_coeff_rest(self):
         return (Integer(1), self)
 
-    def as_base_exp(self):
+    cpdef as_base_exp(self):
         return (self, Integer(1))
 
     def expand(self):
@@ -110,8 +110,8 @@ cdef class Basic:
     #
     # when _Add._equal(a, b) is called a and b are of .type=ADD for sure
     cdef int _equal(Basic self, Basic o):
-        # by default we compare .args
-        return self._args == o.args
+        # by default we compare ._args
+        return self._args == o._args
 
     cdef bint equal(Basic self, Basic o):
         if self.type != o.type:
@@ -235,7 +235,7 @@ cdef Basic _Add_canonicalize(args):
         if a.type == INTEGER:
             num += a
         elif a.type == ADD:
-            for b in a.args:
+            for b in a._args:
                 if b.type == INTEGER:
                     num += b
                 else:
@@ -275,7 +275,7 @@ cdef class _Add(Basic):
     def freeze_args(self):
         #print "add is freezing"
         if self._args_set is None:
-            self._args_set = frozenset(self.args)
+            self._args_set = frozenset(self._args)
         #print "done"
 
     cdef int _equal(_Add self, Basic o):
@@ -287,11 +287,11 @@ cdef class _Add(Basic):
 
 
     def __str__(Basic self):
-        cdef Basic a = self.args[0]
+        cdef Basic a = self._args[0]
         s = str(a)
         if a.type == ADD:
             s = "(%s)" % str(s)
-        for a in self.args[1:]:
+        for a in self._args[1:]:
             s = "%s + %s" % (s, str(a))
             if a.type == ADD:
                 s = "(%s)" % s
@@ -303,13 +303,13 @@ cdef class _Add(Basic):
         #h = hash(self._args_set)
 
         # this is faster:
-        a = list(self.args[:])
+        a = list(self._args)
         a.sort(key=hash)
         return hash_seq(a)
 
     def expand(self):
         r = Integer(0)
-        for term in self.args:
+        for term in self._args:
             r += term.expand()
         return r
 
@@ -334,7 +334,7 @@ cdef Basic _Mul_canonicalize(args):
         if a.type == INTEGER:
             num *= a
         elif a.type == MUL:
-            for b in a.args:
+            for b in a._args:
                 if b.type == INTEGER:
                     num *= b
                 else:
@@ -372,18 +372,18 @@ cdef Basic _Mul_expand_two(Basic a, Basic b):
 
     if a.type == ADD and b.type == ADD:
         r = Integer(0)
-        for x in a.args:
-            for y in b.args:
+        for x in a._args:
+            for y in b._args:
                 r += x*y
         return r
     if a.type == ADD:
         r = Integer(0)
-        for x in a.args:
+        for x in a._args:
             r += x*b
         return r
     if b.type == ADD:
         r = Integer(0)
-        for y in b.args:
+        for y in b._args:
             r += a*y
         return r
     return a*b
@@ -402,7 +402,7 @@ cdef class _Mul(Basic):
         self.freeze_args()
         return hash(self._args_set)
         # this is slower:
-        #a = list(self.args[:])
+        #a = list(self._args[:])
         #a.sort(key=hash)
         #h = hash_seq(a)
         #return h
@@ -410,7 +410,7 @@ cdef class _Mul(Basic):
     def freeze_args(self):
         #print "mul is freezing"
         if self._args_set is None:
-            self._args_set = frozenset(self.args)
+            self._args_set = frozenset(self._args)
         #print "done"
 
 
@@ -422,22 +422,22 @@ cdef class _Mul(Basic):
 
 
     cpdef as_coeff_rest(self):
-        cdef Basic a = self.args[0]
+        cdef Basic a = self._args[0]
 
         if a.type == INTEGER:
             return self.as_two_terms()
         return (Integer(1), self)
 
     def as_two_terms(self):
-        return (self.args[0], Mul(self.args[1:]))
+        return (self._args[0], Mul(self._args[1:]))
 
 
     def __str__(self):
-        cdef Basic a = self.args[0]
+        cdef Basic a = self._args[0]
         s = str(a)
         if a.type in [ADD, MUL]:
             s = "(%s)" % str(s)
-        for a in self.args[1:]:
+        for a in self._args[1:]:
             if a.type in [ADD, MUL]:
                 s = "%s * (%s)" % (s, str(a))
             else:
@@ -471,16 +471,16 @@ cdef Basic _Pow_canonicalize(args):
 
     if base.type == INTEGER:
         if b.i == 0:
-            return Integer(0)
+            return b    # Integer(0)
         if b.i == 1:
-            return Integer(1)
+            return b    # Integer(1)
     if exp.type == INTEGER:
         if e.i == 0:
             return Integer(1)
         if e.i == 1:
             return base
     if base.type == POW:
-        return Pow((base.args[0], base.args[1]*exp))
+        return Pow((base._args[0], base._args[1]*exp))
     return _Pow(args)
 
 
@@ -492,8 +492,8 @@ cdef class _Pow(Basic):
         self._args= tuple(args)
 
     def __str__(_Pow self):
-        cdef Basic b = self.args[0]
-        cdef Basic e = self.args[1]
+        cdef Basic b = self._args[0]
+        cdef Basic e = self._args[1]
         s = str(b)
         if b.type == ADD:
             s = "(%s)" % s
@@ -505,12 +505,12 @@ cdef class _Pow(Basic):
         return s
 
     # XXX struct 2
-    def as_base_exp(_Pow self):
-        return self.args
+    cpdef as_base_exp(_Pow self):
+        return self._args
 
     cpdef Basic expand(_Pow self):
-        cdef Basic  _base = self.args[0]
-        cdef Basic  _exp  = self.args[1]
+        cdef Basic  _base = self._args[0]
+        cdef Basic  _exp  = self._args[1]
 
         # XXX please careful here - use it only after appropriate check
         cdef _Add     base = <_Add>_base
@@ -518,7 +518,7 @@ cdef class _Pow(Basic):
 
         if _base.type == ADD and _exp.type == INTEGER:
             n = exp.i
-            m = len(base.args)
+            m = len(base._args)
             #print "multi"
             d = multinomial_coefficients(m, n)
             #print "assembly"
@@ -528,7 +528,7 @@ cdef class _Pow(Basic):
                     t = []
                 else:
                     t = [Integer(coeff)]
-                for x, p in zip(base.args, powers):
+                for x, p in zip(base._args, powers):
                     if p != 0:
                         t.append(Pow((x, p)))
                 assert len(t) != 0
@@ -540,6 +540,7 @@ cdef class _Pow(Basic):
             r = _Add(r)
             #print "done"
             return r
+
         return self
 
 cpdef Basic sympify(x):
