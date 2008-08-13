@@ -15,14 +15,14 @@ def hash_seq(args):
         m = hash(m + 1001 ^ hash(x))
     return m
 
-class Basic(object):
 
-    def __new__(cls, type, args):
-        obj = object.__new__(cls)
+
+class _Basic(object):
+
+    def __init__(obj, type, args):
         obj.type = type
         obj._args = tuple(args)
         obj.mhash = None
-        return obj
 
     def __repr__(self):
         return str(self)
@@ -95,10 +95,10 @@ class Basic(object):
             return False
 
 
-class Integer(Basic):
+class Integer(_Basic):
 
     def __new__(cls, i):
-        obj = Basic.__new__(cls, INTEGER, [])
+        obj = _Basic.__new__(cls, INTEGER, [])
         obj.i = i
         return obj
 
@@ -124,21 +124,21 @@ class Integer(Basic):
         o = sympify(o)
         if o.type == INTEGER:
             return Integer(self.i+o.i)
-        return Basic.__add__(self, o)
+        return _Basic.__add__(self, o)
 
     def __mul__(self, o):
         o = sympify(o)
         if o.type == INTEGER:
             return Integer(self.i*o.i)
-        return Basic.__mul__(self, o)
+        return _Basic.__mul__(self, o)
+
+def Symbol(name):
+    obj = _Symbol(SYMBOL, [])
+    obj.name = name
+    return obj
 
 
-class Symbol(Basic):
-
-    def __new__(cls, name):
-        obj = Basic.__new__(cls, SYMBOL, [])
-        obj.name = name
-        return obj
+class _Symbol(_Basic):
 
     def __hash__(self):
         if self.mhash is None:
@@ -158,11 +158,11 @@ class Symbol(Basic):
         return self.name
 
 
-class Add(Basic):
+class Add(_Basic):
 
     def __new__(cls, args, canonicalize=True):
         if canonicalize == False:
-            obj = Basic.__new__(cls, ADD, args)
+            obj = _Basic.__new__(cls, ADD, args)
             obj._args_set = None
             return obj
         args = [sympify(x) for x in args]
@@ -254,11 +254,11 @@ class Add(Basic):
             r += term.expand()
         return r
 
-class Mul(Basic):
+class Mul(_Basic):
 
     def __new__(cls, args, canonicalize=True):
         if canonicalize == False:
-            obj = Basic.__new__(cls, MUL, args)
+            obj = _Basic.__new__(cls, MUL, args)
             obj._args_set = None
             return obj
         args = [sympify(x) for x in args]
@@ -387,11 +387,11 @@ class Mul(Basic):
         else:
             return r.expand()
 
-class Pow(Basic):
+class Pow(_Basic):
 
     def __new__(cls, args, canonicalize=True):
         if canonicalize == False:
-            obj = Basic.__new__(cls, POW, args)
+            obj = _Basic.__new__(cls, POW, args)
             return obj
         args = [sympify(x) for x in args]
         return Pow.canonicalize(args)
@@ -496,7 +496,7 @@ def var(s):
             # skip empty strings
             if not t:
                 continue
-            sym = Symbol(t)
+            sym = _Symbol(t)
             frame.f_globals[t] = sym
             res.append(sym)
 
