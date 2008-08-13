@@ -366,21 +366,21 @@ class Mul(Basic):
         Both a and b are assumed to be expanded.
         """
         if a.type == ADD and b.type == ADD:
-            r = Integer(0)
+            terms = []
             for x in a.args:
                 for y in b.args:
-                    r += x*y
-            return r
+                    terms.append(x*y)
+            return Add(terms)
         if a.type == ADD:
-            r = Integer(0)
+            terms = []
             for x in a.args:
-                r += x*b
-            return r
+                terms.append(x*b)
+            return Add(terms)
         if b.type == ADD:
-            r = Integer(0)
+            terms = []
             for y in b.args:
-                r += a*y
-            return r
+                terms.append(a*y)
+            return Add(terms)
         return a*b
 
     def expand(self):
