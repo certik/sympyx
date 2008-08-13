@@ -17,7 +17,7 @@ def hash_seq(args):
 
 
 
-class _Basic(object):
+cdef class _Basic:
 
     def __init__(obj, type, args):
         obj.type = type
@@ -72,7 +72,7 @@ class _Basic(object):
     def __rdiv__(x, y):
         return Mul((y, Pow((x, Integer(-1)))))
 
-    def __pow__(x, y):
+    def __pow__(x, y, z):
         return Pow((x, y))
 
     def __rpow__(x, y):
@@ -84,15 +84,31 @@ class _Basic(object):
     def __pos__(x):
         return x
 
-    def __ne__(self, x):
-        return not self.__eq__(x)
+    #def __ne__(self, x):
+    #    return not self.__eq__(x)
 
-    def __eq__(self, o):
+    #def __eq__(self, o):
+    #    o = sympify(o)
+    #    if o.type == self.type:
+    #        return self.args == o.args
+    #    else:
+    #        return False
+
+    def equal(self, o):
         o = sympify(o)
         if o.type == self.type:
             return self.args == o.args
         else:
             return False
+
+    def __richcmp__(self, o, op):
+        o = sympify(o)
+        if op == 2:
+            return self.equal(o)
+        if op == 3:
+            return not self.equal(o)
+        return NotImplemented
+
 
 def Integer(i):
     obj = _Integer(INTEGER, [])
@@ -110,7 +126,7 @@ class _Integer(_Basic):
         else:
             return self.mhash
 
-    def __eq__(self, o):
+    def equal(self, o):
         o = sympify(o)
         if o.type == INTEGER:
             return self.i == o.i
@@ -148,7 +164,7 @@ class _Symbol(_Basic):
         else:
             return self.mhash
 
-    def __eq__(self, o):
+    def equal(self, o):
         o = sympify(o)
         if o.type == SYMBOL:
             return self.name == o.name
