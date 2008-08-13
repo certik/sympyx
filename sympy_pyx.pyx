@@ -91,13 +91,14 @@ cdef class _Basic:
         else:
             return False
 
-    def __richcmp__(self, o, op):
+    def __richcmp__(_Basic self, o, int op):
         o = sympify(o)
         if op == 2:
             return self.equal(o)
-        if op == 3:
+        elif op == 3:
             return not self.equal(o)
-        return NotImplemented
+        else:
+            return False
 
 
 def Integer(i):
