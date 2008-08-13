@@ -381,21 +381,21 @@ cdef Basic _Mul_expand_two(Basic a, Basic b):
     cdef Basic y
 
     if a.type == ADD and b.type == ADD:
-        r = Integer(0)
+        terms = []
         for x in a._args:
             for y in b._args:
-                r += x*y
-        return r
+                terms.append(x*y)
+        return Add(terms)
     if a.type == ADD:
-        r = Integer(0)
+        terms = []
         for x in a._args:
-            r += x*b
-        return r
+            terms.append(x*b)
+        return Add(terms)
     if b.type == ADD:
-        r = Integer(0)
+        terms = []
         for y in b._args:
-            r += a*y
-        return r
+            terms.append(a*y)
+        return Add(terms)
     return a*b
 
 cdef class _Mul(Basic):
