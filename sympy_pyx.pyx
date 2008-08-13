@@ -117,7 +117,6 @@ class _Integer(Basic):
             return self.mhash
 
     def equal(self, o):
-        o = sympify(o)
         if o.type == INTEGER:
             return self.i == o.i
         else:
@@ -155,7 +154,6 @@ class _Symbol(Basic):
             return self.mhash
 
     def equal(self, o):
-        o = sympify(o)
         if o.type == SYMBOL:
             return self.name == o.name
         return False
@@ -221,7 +219,6 @@ class _Add(Basic):
         #print "done"
 
     def equal(self, o):
-        o = sympify(o)
         if o.type == ADD:
             self.freeze_args()
             o.freeze_args()
@@ -332,7 +329,6 @@ class _Mul(Basic):
         #print "done"
 
     def equal(self, o):
-        o = sympify(o)
         if o.type == MUL:
             self.freeze_args()
             o.freeze_args()
