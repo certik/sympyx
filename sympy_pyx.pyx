@@ -231,12 +231,9 @@ cdef class _Symbol(Basic):
 
 
 # Add.__new__
-cpdef Basic Add(args, canonicalize=True):
-    if canonicalize == False:
-        return _Add(args)
-    else:
-        args = [sympify(x) for x in args]
-        return _Add_canonicalize(args)
+cpdef Basic Add(args):
+    args = [sympify(x) for x in args]
+    return _Add_canonicalize(args)
 
 
 # @staticmethod
@@ -281,7 +278,7 @@ cdef Basic _Add_canonicalize(args):
     if len(args) == 1:
         return args[0]
     else:
-        return Add(args, False)
+        return _Add(args)
 
 
 cdef class _Add(Basic):
@@ -334,10 +331,7 @@ cdef class _Add(Basic):
             r += term.expand()
         return r
 
-cpdef Basic Mul(args, canonicalize=True):
-    if canonicalize == False:
-        return _Mul( args)
-
+cpdef Basic Mul(args):
     args = [sympify(x) for x in args]
     return _Mul_canonicalize(args)
 
@@ -383,7 +377,7 @@ cdef Basic _Mul_canonicalize(args):
     if len(args) == 1:
         return args[0]
     else:
-        return Mul(args, False)
+        return _Mul(args)
 
 
 
@@ -561,9 +555,9 @@ cdef class _Pow(Basic):
                 if len(t) == 1:
                     t = t[0]
                 else:
-                    t = Mul(t, False)
+                    t = _Mul(t)
                 r.append(t)
-            r = Add(r, False)
+            r = _Add(r)
             #print "done"
             return r
         return self
