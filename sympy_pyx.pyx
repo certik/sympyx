@@ -19,7 +19,7 @@ def hash_seq(args):
 
 cdef class Basic:
     #cdef int type
-    #cdef int mhash
+    cdef long long int mhash
     #cdef tuple _args
 
     def __init__(obj, type, args):
@@ -115,7 +115,7 @@ class _Integer(Basic):
     #def __init__(self, type, args):
     #    Basic.__init__(self, type, args)
 
-    def __hash__(self):
+    def __hash__(Basic self):
         if self.mhash == -1:
             h = hash(self.i)
             self.mhash = h
@@ -152,7 +152,7 @@ def Symbol(name):
 
 class _Symbol(Basic):
 
-    def __hash__(self):
+    def __hash__(Basic self):
         if self.mhash == -1:
             h = hash(self.name)
             self.mhash = h
@@ -243,7 +243,7 @@ class _Add(Basic):
                 s = "(%s)" % s
         return s
 
-    def __hash__(self):
+    def __hash__(Basic self):
         if self.mhash == -1:
             # XXX: it is surprising, but this is *not* faster:
             #self.freeze_args()
@@ -315,7 +315,7 @@ class _Mul(Basic):
         else:
             return Mul(args, False)
 
-    def __hash__(self):
+    def __hash__(Basic self):
         if self.mhash == -1:
             # in contrast to Add, here it is faster:
             self.freeze_args()
