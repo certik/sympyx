@@ -312,11 +312,12 @@ cdef class _Add(Basic):
         a.sort(key=hash)
         return hash_seq(a)
 
-    def expand(self):
-        r = Integer(0)
+    cpdef Basic expand(self):
+        r = []
         for term in self._args:
-            r += term.expand()
-        return r
+            r.append( term.expand() )
+
+        return Add(r)
 
 cpdef Basic Mul(args):
     args = [sympify(x) for x in args]

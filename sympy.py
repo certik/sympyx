@@ -85,6 +85,7 @@ def var(s):
 # for debugging
 x = Symbol('x')
 y = Symbol('y')
+z = Symbol('z')
 i = Integer(2)
 
 x2= Symbol('x')
