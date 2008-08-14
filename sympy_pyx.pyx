@@ -67,13 +67,15 @@ cdef class Basic:
     cdef int _hash(self):
             return hash_seq(self._args)
 
-    @property
-    def args(self):
-        return self._args
+    property args:
 
-    @property
-    def type(self):
-        return self._type
+        def __get__(self):
+            return self._args
+
+    property type:
+
+        def __get__(self):
+            return self._type
 
     # XXX struct2
     cpdef as_coeff_rest(self):
