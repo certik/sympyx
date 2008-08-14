@@ -6,7 +6,7 @@ try:
     from sympy import Symbol, Add, Mul
     print 'I: Running SymPy'
 except ImportError:
-    from sympycore import Symbol
+    from sympycore import Symbol, Add, Mul
     print 'I: Running sympycore'
 
 x = Symbol("x")
