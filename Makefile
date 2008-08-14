@@ -4,15 +4,15 @@ PYTHON	:= python
 CYTHON	:= cython --convert-range
 CC	:= gcc
 CFLAGS	:= \
-    	$(shell $(PYTHON)-config --includes)	\
-    	$(shell pkg-config glib-2.0 --cflags)
+    	$(shell $(PYTHON)-config --includes)	#\
+    	#$(shell pkg-config glib-2.0 --cflags)
 
-LIBS	:= -lglib-2.0
+#LIBS	:= -lglib-2.0
 
 CFLAGS	+= -g -O0 -fPIC # -O3
 
 
-all	: csympy.so sympy_pyx.so
+all	: sympy_pyx.so
 
 
 
