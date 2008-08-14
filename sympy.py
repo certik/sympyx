@@ -20,8 +20,7 @@ else:
         INTEGER = 5
 
     except ImportError, e:
-        print
-        print '   %s' % e
+        print 'fail  (%s)' % e
         print 'W: can\'t import sympy_pyx -- will be pure python'
 
     else:
