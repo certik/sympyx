@@ -249,10 +249,10 @@ class Add(Basic):
             return self.mhash
 
     def expand(self):
-        r = Integer(0)
+        r = []
         for term in self.args:
-            r += term.expand()
-        return r
+            r.append( term.expand() )
+        return Add(r)
 
 class Mul(Basic):
 
