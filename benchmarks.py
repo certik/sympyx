@@ -59,6 +59,11 @@ def bench_expand3():
     e = (x+z+y)**20 * (z+x)**9
     e = e.expand()
 
+def bench_expand3():
+    "e=((x**x+y**y+z**z)**10 * (x**y+y**z+z**x)**10); e.expand()"
+    e = ((x**x+y**y+z**z)**10 * (x**y+y**z+z**x)**10)
+    e = e.expand()
+
 def add1():
     "Add(x,<random integer>,y), 2000x"
     i = 2000
@@ -94,12 +99,12 @@ def sum2():
 benchmarks = [
         bench_e2e_1,
         bench_e2e_2,
-        #bench_e2e_3,
+        bench_e2e_3,
+        bench_e2e_4,
         # too slow:
-        #bench_e2e_4,
         #bench_e2e_5,
         bench_expand1,
-        #bench_expand2,
+        bench_expand2,
         bench_expand3,
         add1,
         mul1,
