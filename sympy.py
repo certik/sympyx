@@ -110,3 +110,17 @@ x2= Symbol('x')
 
 
 e = (x+y)**2
+
+
+class sin(Basic):
+
+    def __new__(cls, arg):
+        if arg == 0:
+            return Integer(0)
+        else:
+            obj = Basic.__new__(cls, (arg,))
+            return obj
+
+    def __repr__(self):
+        return "sin(%s)" % self.args[0]
+
