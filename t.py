@@ -28,7 +28,7 @@ a.items()
 b.items()
 t_mul = clock() - t_mul
 print e
-print "# of terms:", len(a2.xargs)
+print "# of terms:", len(a2.args)
 print "time doing multinomial_coefficients:", t_mul
 print "total time2:", t_tot
 
