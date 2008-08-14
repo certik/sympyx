@@ -19,6 +19,17 @@ else:
         POW     = 4
         INTEGER = 5
 
+        from sympy_pyx import _Basic
+
+        # Cython/Pyrex do not support __new__, so we have to define Basic here
+        class Basic(_Basic):
+
+            def __new__(cls, args):
+                o = _Basic.__new__(cls)
+                o._set_rawargs(tuple(args))
+                return o
+
+
     except ImportError, e:
         print 'fail  (%s)' % e
         print 'W: can\'t import sympy_pyx -- will be pure python'

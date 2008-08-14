@@ -16,7 +16,7 @@
 #   currently we have to do:
 #
 #   cdef class Child:
-#       cdef cirt_func(Child a, Basic _b):
+#       cdef cirt_func(Child a, _Basic _b):
 #           cdef Child b = <Child>_b
 #
 #
@@ -25,7 +25,7 @@
 # (4) nested cdef like in here:
 #
 #   if ...:
-#       cdef Basic a = ...
+#       cdef _Basic a = ...
 #
 
 DEF BASIC   = 0
@@ -47,7 +47,8 @@ cdef int hash_seq(args):
 
 
 
-cdef class Basic:
+
+cdef class _Basic:
     cdef int    _type
     cdef int    hash
     cdef tuple  _args   # XXX tuple -> list?
@@ -72,6 +73,11 @@ cdef class Basic:
         def __get__(self):
             return self._args
 
+    # for Basic.__new__
+    def _set_rawargs(self, args):
+        self._args = args
+
+
     property type:
 
         def __get__(self):
@@ -84,7 +90,7 @@ cdef class Basic:
     cpdef as_base_exp(self):
         return (self, Integer(1))
 
-    def expand(self):
+    cpdef _Basic expand(self):
         return self
 
     # NOTE: there is no __rxxx__ methods in Cython/Pyrex
@@ -115,11 +121,11 @@ cdef class Basic:
     # the same type, e.g.
     #
     # when _Add._equal(a, b) is called a and b are of ._type=ADD for sure
-    cdef int _equal(Basic self, Basic o):
+    cdef int _equal(_Basic self, _Basic o):
         # by default we compare ._args
         return self._args == o._args
 
-    cdef bint equal(Basic self, Basic o):
+    cdef bint equal(_Basic self, _Basic o):
         if self._type != o._type:
             return 0
 
@@ -129,7 +135,7 @@ cdef class Basic:
 
 
 
-    def __richcmp__(Basic x, y, int op):
+    def __richcmp__(_Basic x, y, int op):
         #print '__richcmp__ %s %s %i' % (x,y,op)
         y = sympify(y)
 
@@ -145,11 +151,13 @@ cdef class Basic:
         else:
             return False
 
+
+
 cpdef Integer(i):
     return _Integer(i)
 
 
-cdef class _Integer(Basic):
+cdef class _Integer(_Basic):
     cdef object i   # XXX object -> pyint?
 
     def __cinit__(self, i):
@@ -159,7 +167,7 @@ cdef class _Integer(Basic):
     cdef int _hash(self):
         return hash(self.i)
 
-    cdef int _equal(_Integer self, Basic o):
+    cdef int _equal(_Integer self, _Basic o):
         cdef _Integer other = <_Integer>o
         return self.i == other.i
 
@@ -172,30 +180,30 @@ cdef class _Integer(Basic):
 
     # there is no __radd__ in pyrex
     def __add__(_a, _b):
-        cdef Basic a = sympify(_a)
-        cdef Basic b = sympify(_b)
+        cdef _Basic a = sympify(_a)
+        cdef _Basic b = sympify(_b)
         if a._type == INTEGER and b._type == INTEGER:
             return Integer( (<_Integer>a).i + (<_Integer>b).i )
 
-        return Basic.__add__(a, b)
+        return _Basic.__add__(a, b)
 
     # there is no __rmul__ in pyrex
     def __mul__(_a, _b):
-        cdef Basic a = sympify(_a)
-        cdef Basic b = sympify(_b)
+        cdef _Basic a = sympify(_a)
+        cdef _Basic b = sympify(_b)
         if a._type == INTEGER and b._type == INTEGER:
             return Integer( (<_Integer>a).i * (<_Integer>b).i )
-        return Basic.__mul__(a, b)
+        return _Basic.__mul__(a, b)
 
 
 
 # Symbol.__new__
-cpdef Basic Symbol(name):
+cpdef _Basic Symbol(name):
     obj = _Symbol(name)
     return obj
 
 
-cdef class _Symbol(Basic):
+cdef class _Symbol(_Basic):
     cdef object name    # XXX object -> str
 
     def __cinit__(self, name):
@@ -205,7 +213,7 @@ cdef class _Symbol(Basic):
     cdef int _hash(self):
         return hash(self.name)
 
-    cdef int _equal(_Symbol self, Basic o):
+    cdef int _equal(_Symbol self, _Basic o):
         cdef _Symbol other = <_Symbol>o
         #print 'Symbol._equal %s %s' % (self.name, other.name)
         return self.name == other.name
@@ -219,13 +227,13 @@ cdef class _Symbol(Basic):
 
 
 # Add.__new__
-cpdef Basic Add(args):
+cpdef _Basic Add(args):
     args = [sympify(x) for x in args]
     return _Add_canonicalize(args)
 
 
 # @staticmethod
-cdef Basic _Add_canonicalize(args):
+cdef _Basic _Add_canonicalize(args):
 #   use_glib = 0
 #   if use_glib:
 #       from csympy import HashTable
@@ -235,12 +243,12 @@ cdef Basic _Add_canonicalize(args):
 
     cdef dict d = {}
 
-    cdef Basic a
-    cdef Basic b
+    cdef _Basic a
+    cdef _Basic b
     cdef _Integer num = Integer(0)
 
-    cdef Basic coeff
-    cdef Basic key
+    cdef _Basic coeff
+    cdef _Basic key
 
     for a in args:
         if a._type == INTEGER:
@@ -274,7 +282,7 @@ cdef Basic _Add_canonicalize(args):
         return _Add(args)
 
 
-cdef class _Add(Basic):
+cdef class _Add(_Basic):
     cdef object  _args_set  # XXX object -> frozenset
 
     def __cinit__(_Add self, args):
@@ -289,7 +297,7 @@ cdef class _Add(Basic):
             self._args_set = frozenset(self._args)
         #print "done"
 
-    cdef int _equal(_Add self, Basic o):
+    cdef int _equal(_Add self, _Basic o):
         cdef _Add other = <_Add>o
         self .freeze_args()
         other.freeze_args()
@@ -297,8 +305,8 @@ cdef class _Add(Basic):
         return self._args_set == other._args_set
 
 
-    def __str__(Basic self):
-        cdef Basic a = self._args[0]
+    def __str__(_Basic self):
+        cdef _Basic a = self._args[0]
         s = str(a)
         if a._type == ADD:
             s = "(%s)" % str(s)
@@ -318,19 +326,19 @@ cdef class _Add(Basic):
         a.sort(key=hash)
         return hash_seq(a)
 
-    cpdef Basic expand(self):
+    cpdef _Basic expand(self):
         r = []
         for term in self._args:
             r.append( term.expand() )
 
         return Add(r)
 
-cpdef Basic Mul(args):
+cpdef _Basic Mul(args):
     args = [sympify(x) for x in args]
     return _Mul_canonicalize(args)
 
 
-cdef Basic _Mul_canonicalize(args):
+cdef _Basic _Mul_canonicalize(args):
 #   use_glib = 0
 #   if use_glib:
 #       from csympy import HashTable
@@ -340,8 +348,8 @@ cdef Basic _Mul_canonicalize(args):
 
     cdef dict d = {}
 
-    cdef Basic a
-    cdef Basic b
+    cdef _Basic a
+    cdef _Basic b
     cdef _Integer num = Integer(1)
 
     for a in args:
@@ -378,13 +386,13 @@ cdef Basic _Mul_canonicalize(args):
 
 
 # @staticmethod
-cdef Basic _Mul_expand_two(Basic a, Basic b):
+cdef _Basic _Mul_expand_two(_Basic a, _Basic b):
     """
     Both a and b are assumed to be expanded.
     """
-    cdef Basic r
-    cdef Basic x
-    cdef Basic y
+    cdef _Basic r
+    cdef _Basic x
+    cdef _Basic y
 
     if a._type == ADD and b._type == ADD:
         terms = []
@@ -404,7 +412,7 @@ cdef Basic _Mul_expand_two(Basic a, Basic b):
         return Add(terms)
     return a*b
 
-cdef class _Mul(Basic):
+cdef class _Mul(_Basic):
     cdef object _args_set   # XXX object -> frozenset
 
     def __cinit__(self, args):
@@ -430,7 +438,7 @@ cdef class _Mul(Basic):
         #print "done"
 
 
-    cdef int _equal(_Mul self, Basic o):
+    cdef int _equal(_Mul self, _Basic o):
         cdef _Mul other = <_Mul>o
         self .freeze_args()
         other.freeze_args()
@@ -438,7 +446,7 @@ cdef class _Mul(Basic):
 
 
     cpdef as_coeff_rest(self):
-        cdef Basic a = self._args[0]
+        cdef _Basic a = self._args[0]
 
         if a._type == INTEGER:
             return self.as_two_terms()
@@ -446,7 +454,7 @@ cdef class _Mul(Basic):
 
     # XXX struct2
     cpdef as_two_terms(_Mul self):
-        cdef Basic a0 = self._args[0]
+        cdef _Basic a0 = self._args[0]
         if len(self._args) == 2:
             return a0, self._args[1]
 
@@ -457,7 +465,7 @@ cdef class _Mul(Basic):
 
 
     def __str__(self):
-        cdef Basic a = self._args[0]
+        cdef _Basic a = self._args[0]
         s = str(a)
         if a._type in [ADD, MUL]:
             s = "(%s)" % str(s)
@@ -469,10 +477,10 @@ cdef class _Mul(Basic):
         return s
 
 
-    cpdef Basic expand(self):
-        cdef Basic a
-        cdef Basic b
-        cdef Basic r
+    cpdef _Basic expand(self):
+        cdef _Basic a
+        cdef _Basic b
+        cdef _Basic r
         a, b = self.as_two_terms()
         r = _Mul_expand_two(a, b)
         if r == self:
@@ -483,14 +491,14 @@ cdef class _Mul(Basic):
             return r.expand()
 
 # Pow.__new__
-cpdef Basic Pow(args):
+cpdef _Basic Pow(args):
     args = [sympify(x) for x in args]
     return _Pow_canonicalize(args)
 
 # @staticmethod
-cdef Basic _Pow_canonicalize(args):
-    cdef Basic base
-    cdef Basic exp
+cdef _Basic _Pow_canonicalize(args):
+    cdef _Basic base
+    cdef _Basic exp
     base, exp = args
 
     cdef _Integer b = <_Integer>base
@@ -512,15 +520,15 @@ cdef Basic _Pow_canonicalize(args):
 
 
 
-cdef class _Pow(Basic):
+cdef class _Pow(_Basic):
 
     def __cinit__(self, args):
         self._type = POW
         self._args= tuple(args)
 
     def __str__(_Pow self):
-        cdef Basic b = self._args[0]
-        cdef Basic e = self._args[1]
+        cdef _Basic b = self._args[0]
+        cdef _Basic e = self._args[1]
         s = str(b)
         if b._type == ADD:
             s = "(%s)" % s
@@ -535,9 +543,9 @@ cdef class _Pow(Basic):
     cpdef as_base_exp(_Pow self):
         return self._args
 
-    cpdef Basic expand(_Pow self):
-        cdef Basic  _base = self._args[0]
-        cdef Basic  _exp  = self._args[1]
+    cpdef _Basic expand(_Pow self):
+        cdef _Basic  _base = self._args[0]
+        cdef _Basic  _exp  = self._args[1]
 
         # XXX please careful here - use it only after appropriate check
         cdef _Add     base = <_Add>_base
@@ -547,8 +555,8 @@ cdef class _Pow(Basic):
 
         cdef list r
         cdef list t
-        cdef Basic term
-        cdef Basic ret
+        cdef _Basic term
+        cdef _Basic ret
 
         if _base._type == ADD and _exp._type == INTEGER:
             n = exp.i
@@ -579,7 +587,7 @@ cdef class _Pow(Basic):
 
         return self
 
-cpdef Basic sympify(x):
+cpdef _Basic sympify(x):
     if isinstance(x, int):
         return Integer(x)
     return x
