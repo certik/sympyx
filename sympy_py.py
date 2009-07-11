@@ -23,6 +23,7 @@ class Basic(object):
         obj._args = tuple(args)
         obj.mhash = None
         obj.changes_add = False
+        obj.changes_mul = False
         return obj
 
     def __repr__(self):
@@ -72,15 +73,31 @@ class Basic(object):
                 d[key] = coeff
 
     def combine_mul(self, d):
+        key, coeff = self.as_base_exp()
         one = Integer(1)
-        if self.type == INTEGER:
-            d[one] *= self
+        if any([x.changes_mul for x in d]):
+            e = {one: d[one], key: coeff}
+            for x in d:
+                if x.changes_mul:
+                    x.combine_mul(e)
+                else:
+                    if x.type == INTEGER:
+                        e[one] *= x
+                    else:
+                        if x in e:
+                            e[x] += d[x]
+                        else:
+                            e[x] = d[x]
+            d.clear()
+            d.update(e)
         else:
-            key, coeff = self.as_base_exp()
-            if key in d:
-                d[key] += coeff
+            if self.type == INTEGER:
+                d[one] *= self
             else:
-                d[key] = coeff
+                if key in d:
+                    d[key] += coeff
+                else:
+                    d[key] = coeff
 
     def has(self, x):
         if self == x:
