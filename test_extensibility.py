@@ -9,14 +9,12 @@ class Constant(Symbol):
         return obj
 
     def combine_add(self, d):
-        if self.sym in d:
-            e = {self: 1, self.sym: d[self.sym]}
-            d.clear()
-            d.update(e)
-        else:
-            e = {self: 1}
-            d.clear()
-            d.update(e)
+        e = {self: 1}
+        for x in d:
+            if x == self.sym or x.has(self.sym):
+                e[x] = d[x]
+        d.clear()
+        d.update(e)
 
 def test_constant():
     e = x + y
@@ -33,3 +31,5 @@ def test_constant():
     assert e + A + x + y == A + 2*x
     assert A + y == A
     assert y + A == A
+    assert A + x + 2**x + y == A + x + 2**x
+    assert A + x + y + x*y == A + x + x*y
