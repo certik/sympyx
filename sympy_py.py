@@ -51,10 +51,19 @@ class Basic(object):
 
     def combine_add(self, d):
         coeff, key = self.as_coeff_rest()
-        if key in d:
-            d[key] += coeff
+        if any([x.changes_add for x in d]):
+            # we have to go through all keys and try to combine them one by one
+            e = {key: coeff}
+            for x in d:
+                x.combine_add(e)
+            d.clear()
+            d.update(e)
         else:
-            d[key] = coeff
+            # speed track:
+            if key in d:
+                d[key] += coeff
+            else:
+                d[key] = coeff
 
     def combine_mul(self, d):
         key, coeff = self.as_base_exp()
