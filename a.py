@@ -2,7 +2,7 @@ from sympy import x, y, Symbol, Integer
 from test_extensibility import Constant
 
 e = x + y
-#A = Constant("A", x)
+A = Constant("A", x)
     #print e
     #rint "-"*40
     #rint e + A
@@ -22,6 +22,7 @@ e = x + y
     # assert C+x+2**x+y+2 == C+x+2**x
 #print A+x+2**x+y+2
 #print 2+A+x+2**x+y
-#print 2+A+x
-print e
-print x + 0
+print "-"*40
+print 2+A+x
+#print e
+#print x + 0

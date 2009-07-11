@@ -15,7 +15,7 @@ class Constant(Symbol):
         for x in d:
             if x == self.sym or x.has(self.sym):
                 e[x] = d[x]
-        #e[one] = Integer(0)
+        e[one] = Integer(0)
         d.clear()
         d.update(e)
         print d
@@ -37,3 +37,8 @@ def test_constant():
     assert y + A == A
     assert A + x + 2**x + y == A + x + 2**x
     assert A + x + y + x*y == A + x + x*y
+
+    assert 2 + A == A
+    assert A + 2 == A
+    assert A + x + 2**x + y + 2 == A + x + 2**x
+    assert A + x + y + x*y + 2 == A + x + x*y
