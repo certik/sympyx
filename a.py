@@ -29,6 +29,11 @@ def test_constant():
     assert A + x + y == A + x
     assert A + y + x == A + x
     assert y + A + y + x == A + x
+    assert e + A + e == A + 2*x
+    assert e + A + y + x == A + 2*x
+    #assert e + A + x + y == A + 2*x
+    assert A + y == A
+    assert y + A == A
 
 
 if __name__ == "__main__":
