@@ -10,15 +10,30 @@ class Constant(Symbol):
 
     def combine_add(self, d):
         if self.sym in d:
-            del d[x]
+            e = {self.sym: d[self.sym]}
+            d.clear()
+            d.update(e)
         return Symbol.combine_add(self, d)
 
-e = x + y
-A = Constant("A", x)
-print e
-print "-"*40
-print e + A
-print "-"*40
-print A + e
-print "-"*40
-print A + x + y
+def test_constant():
+    e = x + y
+    A = Constant("A", x)
+    assert e + A == A + x
+    assert A + e == A + x
+    assert y + A + e == A + x
+    assert y + y + A + e == A + x
+    assert A + x + y == A + x
+    assert A + y + x == A + x
+    assert y + A + y + x == A + x
+
+
+if __name__ == "__main__":
+    e = x + y
+    A = Constant("A", x)
+    print e
+    print "-"*40
+    print e + A
+    print "-"*40
+    print y+A + e
+    print "-"*40
+    print y+A + x + y
