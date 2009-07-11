@@ -55,7 +55,13 @@ class Basic(object):
             # we have to go through all keys and try to combine them one by one
             e = {key: coeff}
             for x in d:
-                x.combine_add(e)
+                if x.changes_add:
+                    x.combine_add(e)
+                else:
+                    if x in e:
+                        e[x] += coeff
+                    else:
+                        e[x] = coeff
             d.clear()
             d.update(e)
         else:
