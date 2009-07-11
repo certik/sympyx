@@ -59,9 +59,9 @@ class Basic(object):
                     x.combine_add(e)
                 else:
                     if x in e:
-                        e[x] += coeff
+                        e[x] += d[x]
                     else:
-                        e[x] = coeff
+                        e[x] = d[x]
             d.clear()
             d.update(e)
         else:

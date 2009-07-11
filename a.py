@@ -31,7 +31,7 @@ def test_constant():
     assert y + A + y + x == A + x
     assert e + A + e == A + 2*x
     assert e + A + y + x == A + 2*x
-    #assert e + A + x + y == A + 2*x
+    assert e + A + x + y == A + 2*x
     assert A + y == A
     assert y + A == A
 
@@ -49,3 +49,7 @@ if __name__ == "__main__":
     print x + A + x
     print A + y
     print A+x+y
+
+    f = e + A + x
+    print f
+    print f + y
