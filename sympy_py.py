@@ -53,7 +53,8 @@ class Basic(object):
         coeff, key = self.as_coeff_rest()
         if any([x.changes_add for x in d]):
             # we have to go through all keys and try to combine them one by one
-            e = {key: coeff}
+            one = Integer(1)
+            e = {one: d[one], key: coeff}
             for x in d:
                 if x.changes_add:
                     x.combine_add(e)
@@ -215,25 +216,27 @@ class Add(Basic):
             d = HashTable()
         else:
             d = {}
-        num = Integer(0)
+        one = Integer(1)
+        d[one] = Integer(0)
         for a in args:
             if a.type == INTEGER:
-                num += a
+                d[one] += a
             elif a.type == ADD:
                 for b in a.args:
                     if b.type == INTEGER:
-                        num += b
+                        d[one] += b
                     else:
                         b.combine_add(d)
             else:
                 a.combine_add(d)
-        if len(d)==0:
-            return num
+        if len(d)==1:
+            return d[one]
         args = []
         for a, b in d.iteritems():
-            args.append(Mul((a, b)))
-        if num.i != 0:
-            args.insert(0, num)
+            if a != one:
+                args.append(Mul((a, b)))
+        if d[one].i != 0:
+            args.insert(0, d[one])
         if len(args) == 1:
             return args[0]
         else:

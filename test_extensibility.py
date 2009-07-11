@@ -1,4 +1,4 @@
-from sympy import x, y, Symbol
+from sympy import x, y, Symbol, Integer
 
 class Constant(Symbol):
 
@@ -9,7 +9,8 @@ class Constant(Symbol):
         return obj
 
     def combine_add(self, d):
-        e = {self: 1}
+        one = Integer(1)
+        e = {one: d[one], self: 1}
         for x in d:
             if x == self.sym or x.has(self.sym):
                 e[x] = d[x]
