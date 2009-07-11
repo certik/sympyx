@@ -210,3 +210,16 @@ def test_hash3():
     d[e1] = 1
     assert e1 in d
     assert e2 in d
+
+def test_has():
+    x = Symbol("x")
+    y = Symbol("y")
+    z = Symbol("z")
+    assert x.has(x)
+    assert not x.has(y)
+    assert (x*y).has(x)
+    assert (x*y).has(y)
+    assert not (x*y).has(z)
+    assert (x+y).has(x)
+    assert (x+y).has(y)
+    assert not (x+y).has(z)

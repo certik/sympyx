@@ -78,6 +78,15 @@ class Basic(object):
         else:
             d[key] = coeff
 
+    def has(self, x):
+        if self == x:
+            return True
+        else:
+            for y in self.args:
+                if y.has(x):
+                    return True
+            return False
+
     def __add__(x, y):
         return Add((x, y))
 
