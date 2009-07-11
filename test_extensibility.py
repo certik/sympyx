@@ -9,7 +9,7 @@ class Constant(Symbol):
         return obj
 
     def combine_add(self, d):
-        print self, d,
+        #print self, d,
         one = Integer(1)
         e = {one: d[one], self: 1}
         for x in d:
@@ -18,7 +18,7 @@ class Constant(Symbol):
         e[one] = Integer(0)
         d.clear()
         d.update(e)
-        print d
+        #print d
 
 def test_constant():
     e = x + y
