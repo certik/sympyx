@@ -48,6 +48,20 @@ class Basic(object):
     def expand(self):
         return self
 
+    def combine_add(self, d):
+        coeff, key = self.as_coeff_rest()
+        if key in d:
+            d[key] += coeff
+        else:
+            d[key] = coeff
+
+    def combine_mul(self, d):
+        key, coeff = self.as_base_exp()
+        if key in d:
+            d[key] += coeff
+        else:
+            d[key] = coeff
+
     def __add__(x, y):
         return Add((x, y))
 
@@ -185,17 +199,9 @@ class Add(Basic):
                     if b.type == INTEGER:
                         num += b
                     else:
-                        coeff, key = b.as_coeff_rest()
-                        if key in d:
-                            d[key] += coeff
-                        else:
-                            d[key] = coeff
+                        b.combine_add(d)
             else:
-                coeff, key = a.as_coeff_rest()
-                if key in d:
-                    d[key] += coeff
-                else:
-                    d[key] = coeff
+                a.combine_add(d)
         if len(d)==0:
             return num
         args = []
@@ -281,17 +287,9 @@ class Mul(Basic):
                     if b.type == INTEGER:
                         num *= b
                     else:
-                        key, coeff = b.as_base_exp()
-                        if key in d:
-                            d[key] += coeff
-                        else:
-                            d[key] = coeff
+                        b.combine_mul(d)
             else:
-                key, coeff = a.as_base_exp()
-                if key in d:
-                    d[key] += coeff
-                else:
-                    d[key] = coeff
+                a.combine_mul(d)
         if num.i == 0 or len(d)==0:
             return num
         args = []
