@@ -78,3 +78,31 @@ def test_constant_mul():
     assert A * 2 == A
     assert A * x * 2**x * y * 2 == A * x * 2**x
     assert A * x * y * x*y * 2 == A * x * x*y
+
+def test_constant_sympy():
+    x = Symbol('x')
+    y = Symbol('y')
+    z = Symbol('z')
+    C = Constant('C', x)
+    assert y*C == C
+    assert x*C == x*Constant('C', x)
+    assert C*y == C
+    assert C*x == x*Constant('C', x)
+    assert 2*C == C
+    assert C*2 == C
+    assert y*C*x == C*x
+    assert x*y*C == x*C
+    assert y*x*C == x*C
+    assert C*y*(y+1) == C
+    assert y*C*(y+1) == C
+    assert x*(y*C) == x*C
+    assert x*(C*y) == x*C
+    assert C*(x*y) == C*x
+    assert (x*y)*C == x*C
+    assert (y*x)*C == x*C
+    assert y*(y+1)*C == C
+    assert C*x*y == C*x
+    assert x*C*y == x*C
+    assert (C*x)*y == C*x
+    assert y*(x*C) == x*C
+    assert (x*C)*y == x*C
