@@ -10,10 +10,11 @@ class Constant(Symbol):
 
     def combine_add(self, d):
         if self.sym in d:
-            e = {self.sym: d[self.sym]}
+            e = {self: 1, self.sym: d[self.sym]}
             d.clear()
             d.update(e)
-        return Symbol.combine_add(self, d)
+        else:
+            return Symbol.combine_add(self, d)
 
 def test_constant():
     e = x + y
@@ -36,4 +37,5 @@ if __name__ == "__main__":
     print "-"*40
     print y+A + e
     print "-"*40
-    print y+A + x + y
+    #print x + y + A + x + y
+    #print x + A + x
