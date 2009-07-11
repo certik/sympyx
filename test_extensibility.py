@@ -9,13 +9,16 @@ class Constant(Symbol):
         return obj
 
     def combine_add(self, d):
+        print self, d,
         one = Integer(1)
         e = {one: d[one], self: 1}
         for x in d:
             if x == self.sym or x.has(self.sym):
                 e[x] = d[x]
+        #e[one] = Integer(0)
         d.clear()
         d.update(e)
+        print d
 
 def test_constant():
     e = x + y

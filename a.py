@@ -1,8 +1,8 @@
-from sympy import x, y, Symbol
+from sympy import x, y, Symbol, Integer
 from test_extensibility import Constant
 
 e = x + y
-A = Constant("A", x)
+#A = Constant("A", x)
     #print e
     #rint "-"*40
     #rint e + A
@@ -18,7 +18,10 @@ A = Constant("A", x)
     #print f
     #print f + y
     # assert C+x+y+x*y+2 == C+x+x*y
-print A+x+y+x*y+2
+#print A+x+y+x*y+2
     # assert C+x+2**x+y+2 == C+x+2**x
-print A+x+2**x+y+2
-
+#print A+x+2**x+y+2
+#print 2+A+x+2**x+y
+#print 2+A+x
+print e
+print x + 0
