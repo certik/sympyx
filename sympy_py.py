@@ -59,8 +59,6 @@ class Basic(object):
                 if x.changes_add:
                     x.combine_add(e)
                 else:
-                    if x.type == INTEGER:
-                        continue
                     if x in e:
                         e[x] += d[x]
                     else:
@@ -223,15 +221,11 @@ class Add(Basic):
         one = Integer(1)
         d[one] = Integer(0)
         for a in args:
-            print "1", a, d
             if a.type == ADD:
                 for b in a.args:
                     b.combine_add(d)
             else:
-                print "2", a, d
                 a.combine_add(d)
-                print "3", a, d
-            print a, d
         if len(d)==1:
             return d[one]
         args = []
