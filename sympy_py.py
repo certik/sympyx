@@ -22,6 +22,7 @@ class Basic(object):
         obj.type = type
         obj._args = tuple(args)
         obj.mhash = None
+        obj.changes_add = False
         return obj
 
     def __repr__(self):
