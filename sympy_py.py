@@ -81,8 +81,8 @@ class Basic(object):
                 if x.changes_mul:
                     x.combine_mul(e)
                 else:
-                    if x.type == INTEGER:
-                        e[one] *= x
+                    if x.type == INTEGER and x == one:
+                        e[one] *= d[x]
                     else:
                         if x in e:
                             e[x] += d[x]

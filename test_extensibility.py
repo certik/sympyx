@@ -26,7 +26,7 @@ class Constant(Symbol):
         one = Integer(1)
         e = {one: d[one], self: 1}
         for x in d:
-            if x == self.sym or x.has(self.sym):
+            if x == self.sym or x.has(self.sym) or d[x].has(self.sym):
                 e[x] = d[x]
         e[one] = Integer(1)
         d.clear()
@@ -109,3 +109,4 @@ def test_more():
     A = Constant("A", x)
     assert A*x+y == A*x + y
     assert A*x+y != A*x
+    assert A*x*2**x != A*x
