@@ -72,11 +72,15 @@ class Basic(object):
                 d[key] = coeff
 
     def combine_mul(self, d):
-        key, coeff = self.as_base_exp()
-        if key in d:
-            d[key] += coeff
+        one = Integer(1)
+        if self.type == INTEGER:
+            d[one] *= self
         else:
-            d[key] = coeff
+            key, coeff = self.as_base_exp()
+            if key in d:
+                d[key] += coeff
+            else:
+                d[key] = coeff
 
     def has(self, x):
         if self == x:
@@ -303,25 +307,22 @@ class Mul(Basic):
             d = HashTable()
         else:
             d = {}
-        num = Integer(1)
+        one = Integer(1)
+        d[one] = one
         for a in args:
-            if a.type == INTEGER:
-                num *= a
-            elif a.type == MUL:
+            if a.type == MUL:
                 for b in a.args:
-                    if b.type == INTEGER:
-                        num *= b
-                    else:
-                        b.combine_mul(d)
+                    b.combine_mul(d)
             else:
                 a.combine_mul(d)
-        if num.i == 0 or len(d)==0:
-            return num
+        if d[one].i == 0 or len(d)==1:
+            return d[one]
         args = []
         for a, b in d.iteritems():
-            args.append(Pow((a, b)))
-        if num.i != 1:
-            args.insert(0, num)
+            if a != one:
+                args.append(Pow((a, b)))
+        if d[one].i != 1:
+            args.insert(0, d[one])
         if len(args) == 1:
             return args[0]
         else:
